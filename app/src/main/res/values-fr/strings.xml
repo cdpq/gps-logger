@@ -81,6 +81,7 @@
     <string name="dlg_button_cancel">Annuler</string>
     <!-- Tracklist -->
     <string name="tracklist_empty">Archives vides</string>
+    <string name="tracklist_button_cdpq">Tout envoyer au CDPQ</string>
     <string name="card_trackinfo_length">Longueur</string>
     <string name="card_trackinfo_duration">Durée</string>
     <string name="card_trackinfo_altitude_gap">Δ Alt</string>

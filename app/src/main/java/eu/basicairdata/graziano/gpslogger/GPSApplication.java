@@ -1353,6 +1353,8 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
                         Log.w("myApp", "[#] GPSApplication.java - TASK_NEWTRACK: " + track.getId());
                         _currentTrack = track;
                         UpdateTrackList();
+
+                        // TODO: Export track to desired files using the Exporter (if exportOnNewTrack option is set to true).
                     } else Log.w("myApp", "[#] GPSApplication.java - TASK_NEWTRACK: Track " + track.getId() + " already empty (New track not created)");
                     _currentTrack = track;
                     EventBus.getDefault().post(EventBusMSG.UPDATE_TRACK);

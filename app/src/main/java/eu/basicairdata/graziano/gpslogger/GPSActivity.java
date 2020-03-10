@@ -121,10 +121,9 @@ public class GPSActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         viewPager = findViewById(R.id.id_viewpager);
-        viewPager.setOffscreenPageLimit(3);
+        viewPager.setOffscreenPageLimit(4);
 
         setupViewPager(viewPager);
-
         tabLayout = findViewById(R.id.id_tablayout);
         tabLayout.setTabMode(TabLayout.MODE_FIXED);
         tabLayout.setupWithViewPager(viewPager);
@@ -317,7 +316,7 @@ public class GPSActivity extends AppCompatActivity {
 
     private void updateBottomSheetPosition() {
         activeTab = tabLayout.getSelectedTabPosition();
-        if (activeTab != 2) {
+        if (activeTab < 2) {
             mBottomSheetBehavior.setPeekHeight(1);
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             //Log.w("myApp", "[#] GPSActivity.java - mBottomSheetBehavior.setPeekHeight(" + bottomSheet.getHeight() +");");
@@ -334,6 +333,7 @@ public class GPSActivity extends AppCompatActivity {
         adapter.addFragment(new FragmentGPSFix(), getString(R.string.tab_gpsfix));
         adapter.addFragment(new FragmentTrack(), getString(R.string.tab_track));
         adapter.addFragment(new FragmentTracklist(), getString(R.string.tab_tracklist));
+        adapter.addFragment(new FragmentSettings(), getString(R.string.menu_settings));
         viewPager.setAdapter(adapter);
     }
 

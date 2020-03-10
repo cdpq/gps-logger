@@ -18,6 +18,7 @@
 
 package eu.basicairdata.graziano.gpslogger;
 
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 
@@ -613,16 +614,23 @@ class Exporter extends Thread {
 
                 KMLbw.close();
                 KMLfw.close();
+
+                // TODO: Transfert file via FTP to CDPQ FTP location when exported as kml (if sendToCDPQOnExport is set to true).
+                new TransferFileViaFTP().execute(KMLfile);
             }
             if (ExportGPX) {
                 GPXbw.write("</gpx>");
 
                 GPXbw.close();
                 GPXfw.close();
+
+                // TODO: Transfert file via FTP to CDPQ FTP location when exported as gpx (if sendToCDPQOnExport is set to true).
             }
             if (ExportTXT) {
                 TXTbw.close();
                 TXTfw.close();
+
+                // TODO: Transfert file via FTP to CDPQ FTP location when exported as txt (if sendToCDPQOnExport is set to true).
             }
 
             Log.w("myApp", "[#] Exporter.java - Track "+ track.getId() +" exported in " + (System.currentTimeMillis() - start_Time) + " ms (" + elements_total + " pts @ " + ((1000L * elements_total) / (System.currentTimeMillis() - start_Time)) + " pts/s)");
@@ -640,6 +648,29 @@ class Exporter extends Thread {
         }
     }
 
+    private class TransferFileViaFTP extends AsyncTask<File, Void, Boolean>
+    {
+        @Override
+        protected Boolean doInBackground(File... files) {
+
+            if (files == null)
+            {
+                Log.w("myApp", "doInBackground: error: \"params\" is null.");
+                return false;
+            }
+
+            if (files.length == 0)
+            {
+                Log.w("myApp", "doInBackground: error: \"params\" is empty.");
+                return false;
+            }
+
+            Log.w("myApp", "doInBackground: error: Transferring \"" + files[0].getName() + "\"...");
+
+
+            return true;
+        }
+    }
 
     private class AsyncGeopointsLoader extends Thread {
 
