@@ -1349,6 +1349,7 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
                         track = new Track();
                         // ----
                         track.setId(GPSDataBase.addTrack(track));
+                        Log.w("myApp", "[#] GPSApplication.java - TASK_NEWTRACK: " + track.getName());
                         Log.w("myApp", "[#] GPSApplication.java - TASK_NEWTRACK: " + track.getId());
                         _currentTrack = track;
                         UpdateTrackList();

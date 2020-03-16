@@ -178,6 +178,10 @@
     <string name="pref_category_exporting">EXPORTATION</string>
     <string name="pref_export_when_completed">Export Tracks When Completed</string>
     <string name="pref_export_when_completed_summary">Whether or not tracks should be automatically exported when completed</string>
+    <string name="pref_file_name_prefix">File Name Prefix</string>
+    <string name="pref_file_name_prefix_summary">Entre file name prefix</string>
+    <string name="pref_track_id_as_suffix">Use Track ID as Suffix</string>
+    <string name="pref_track_id_as_suffix_summary">Add the track ID in the file name</string>
     <string name="pref_export_TXT">Export Tracks in TXT</string>
     <string name="pref_export_TXT_summary">Plain text, comma-separated values</string>
     <string name="pref_TXT_system_of_measurement">TXT Units of measurement</string>

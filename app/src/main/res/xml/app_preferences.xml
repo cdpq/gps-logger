@@ -134,6 +134,17 @@
             android:summary="@string/pref_export_when_completed_summary"
             android:defaultValue="false" />
 
+        <android.support.v7.preference.EditTextPreference
+            android:key="prefFileNamePrefix"
+            android:title="@string/pref_file_name_prefix"
+            android:summary="@string/pref_file_name_prefix_summary" />
+
+        <android.support.v7.preference.SwitchPreferenceCompat
+            android:key="prefTrackIDAsSuffix"
+            android:title="@string/pref_track_id_as_suffix"
+            android:summary="@string/pref_track_id_as_suffix_summary"
+            android:defaultValue="false" />
+
         <android.support.v7.preference.SwitchPreferenceCompat
             android:key="prefExportTXT"
             android:title="@string/pref_export_TXT"

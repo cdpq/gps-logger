@@ -18,8 +18,12 @@
 
 package eu.basicairdata.graziano.gpslogger;
 
+import android.content.SharedPreferences;
 import android.location.Location;
+import android.preference.PreferenceManager;
+import android.util.Log;
 
+import java.text.Format;
 import java.text.SimpleDateFormat;
 
 public class Track {
@@ -134,6 +138,15 @@ public class Track {
             if (Name.equals("")) {
                 SimpleDateFormat df2 = new SimpleDateFormat("yyyyMMdd-HHmmss");
                 Name = df2.format(Start_Time);
+
+                SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(GPSApplication.getInstance().getBaseContext());
+                boolean Suffix = settings.getBoolean("prefTrackIDAsSuffix", false);
+                String Prefix = settings.getString("prefFileNamePrefix", "");
+
+                Log.w("myApp", "add: Prefix = " + Prefix.length());
+
+                if (Suffix) { Name += "_" + id; }
+                if (Prefix.length() != 0) { Name = Prefix + "_" + Name; }
             }
 
             LastFix_Time = Start_Time;
