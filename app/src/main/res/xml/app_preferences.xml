@@ -164,4 +164,36 @@
 
     </android.support.v7.preference.PreferenceCategory>
 
+    <android.support.v7.preference.PreferenceCategory
+        android:title="@string/pref_category_FTP">
+
+        <android.support.v7.preference.SwitchPreferenceCompat
+            android:key="prefFTPExportWhenDone"
+            android:title="@string/pref_FTP_transfer_track_when_done"
+            android:summary="@string/pref_FTP_transfer_track_when_done_summary"
+            android:defaultValue="false"/>
+
+        <android.support.v7.preference.EditTextPreference
+            android:key="prefFTPHost"
+            android:title="@string/pref_FTP_host"
+            android:summary="@string/pref_FTP_host_summary" />
+
+        <android.support.v7.preference.EditTextPreference
+            android:key="prefFTPUser"
+            android:title="@string/pref_FTP_user"
+            android:summary="@string/pref_FTP_user_summary" />
+
+        <android.support.v7.preference.EditTextPreference
+            android:key="prefFTPPassword"
+            android:inputType="textPassword"
+            android:title="@string/pref_FTP_password"
+            android:summary="@string/pref_FTP_password_summary" />
+
+        <android.support.v7.preference.EditTextPreference
+            android:key="prefFTPPath"
+            android:title="@string/pref_FTP_path"
+            android:summary="@string/pref_FTP_path_summary" />
+
+    </android.support.v7.preference.PreferenceCategory>
+
 </android.support.v7.preference.PreferenceScreen>

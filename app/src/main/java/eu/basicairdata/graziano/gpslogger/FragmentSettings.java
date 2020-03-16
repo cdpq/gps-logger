@@ -158,6 +158,8 @@ public class FragmentSettings extends PreferenceFragmentCompat {
                     }
                 }
 
+                SetupPreferences();
+
                 if (key.equals("prefColorTheme")) {
                     SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getContext());
                     SharedPreferences.Editor editor1 = settings.edit();
@@ -168,8 +170,6 @@ public class FragmentSettings extends PreferenceFragmentCompat {
                     getActivity().getWindow().setWindowAnimations(R.style.MyCrossfadeAnimation_Window);
                     getActivity().recreate();
                 }
-
-                SetupPreferences();
             }
         };
     }
@@ -213,6 +213,10 @@ public class FragmentSettings extends PreferenceFragmentCompat {
         ListPreference pViewTracksWith = (ListPreference) findPreference("prefViewTracksWith");
         ListPreference pColorTheme = (ListPreference) findPreference("prefColorTheme");
         EditTextPreference pAltitudeCorrection = (EditTextPreference) findPreference("prefAltitudeCorrectionRaw");
+        EditTextPreference pFTPHost = (EditTextPreference) findPreference("prefFTPHost");
+        EditTextPreference pFTPUser = (EditTextPreference) findPreference("prefFTPUser");
+        EditTextPreference pFTPPassword = (EditTextPreference) findPreference("prefFTPPassword");
+        EditTextPreference pFTPPath = (EditTextPreference) findPreference("prefFTPPath");
 
         altcorm = Double.valueOf(prefs.getString("prefAltitudeCorrection", "0"));
         altcor = prefs.getString("prefUM", "0").equals("0") ? altcorm : altcorm * M_TO_FT;
@@ -248,6 +252,10 @@ public class FragmentSettings extends PreferenceFragmentCompat {
         pShowTrackStatsType.setSummary(pShowTrackStatsType.getEntry());
         pShowDirections.setSummary(pShowDirections.getEntry());
         pViewTracksWith.setSummary(pViewTracksWith.getEntry());
+        pFTPHost.setSummary(pFTPHost.getText());
+        pFTPUser.setSummary(pFTPUser.getText());
+        pFTPPassword.setSummary(pFTPPassword.getText());
+        pFTPPath.setSummary(pFTPPath.getText());
     }
 
 

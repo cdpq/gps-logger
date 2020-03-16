@@ -194,6 +194,18 @@
     <string name="pref_track_stats_totaltime">Total time</string>
     <string name="pref_track_stats_movingtime">Moving time</string>
 
+    <string name="pref_category_FTP">FTP</string>
+    <string name="pref_FTP_transfer_track_when_done">Transfer track when done</string>
+    <string name="pref_FTP_transfer_track_when_done_summary">Whether or not tracks should be automatically transferred when done</string>
+    <string name="pref_FTP_host">Host</string>
+    <string name="pref_FTP_host_summary">Enter host</string>
+    <string name="pref_FTP_user">User</string>
+    <string name="pref_FTP_user_summary">Enter user</string>
+    <string name="pref_FTP_password">Password</string>
+    <string name="pref_FTP_password_summary">Enter password</string>
+    <string name="pref_FTP_path">Path</string>
+    <string name="pref_FTP_path_summary">The folder where the data will be transferred</string>
+
     <!-- Preferences toasts -->
     <string name="toast_download_error">Download error</string>
     <string name="toast_download_completed">Download completed</string>

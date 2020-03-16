@@ -106,17 +106,18 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
     private int     prefViewTracksWith          = 0;
     private int     prefUM                      = UM_METRIC_KMH;
     private float   prefGPSdistance             = 0f;
-    private long    prefGPSupdatefrequency      = 1000L;
+    private long    prefGPSUpdateFrequency      = 1000L;
     private boolean prefEGM96AltitudeCorrection = false;
     private double  prefAltitudeCorrection      = 0d;
-    private boolean prefExportKML               = true;
-    private boolean prefExportGPX               = true;
+    //private boolean prefExportKML               = true;
+    //private boolean prefExportGPX               = true;
     private int     prefGPXVersion              = 100;            // the version of the GPX schema
-    private boolean prefExportTXT               = false;
+    //private boolean prefExportTXT               = false;
     private int     prefKMLAltitudeMode         = 0;
     private int     prefShowTrackStatsType      = 0;
     private int     prefShowDirections          = 0;
     private boolean prefGPSWeekRolloverCorrected= false;
+    private boolean prefFTPExportWhenDone       = false;
 
     private boolean LocationPermissionChecked   = false;          // If the flag is false the GPSActivity will check for Location Permission
     private boolean isFirstRun                  = false;          // True if it is the first run of the app (the DB is empty)
@@ -457,15 +458,18 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
     }
 
     public boolean getPrefExportKML() {
-        return prefExportKML;
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return preferences.getBoolean("prefExportKML", false);
     }
 
     public boolean getPrefExportGPX() {
-        return prefExportGPX;
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return preferences.getBoolean("prefExportGPX", false);
     }
 
     public boolean getPrefExportTXT() {
-        return prefExportTXT;
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return preferences.getBoolean("prefExportTXT", false);
     }
 
     public int getPrefUM() {
@@ -478,6 +482,11 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
 
     public int getPrefShowDirections() {
         return prefShowDirections;
+    }
+
+    public boolean getPrefFTPExportWhenDone() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return preferences.getBoolean("prefFTPExportWhenDone", false);
     }
 
     public LocationExtended getCurrentLocationExtended() {
@@ -786,10 +795,10 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
         if (state && !isGPSLocationUpdatesActive
                 && (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
             mlocManager.addGpsStatusListener(this);
-            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, prefGPSupdatefrequency, 0, this); // Requires Location update
+            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, prefGPSUpdateFrequency, 0, this); // Requires Location update
             isGPSLocationUpdatesActive = true;
             //Log.w("myApp", "[#] GPSApplication.java - setGPSLocationUpdates = true");
-            if (prefGPSupdatefrequency >= 1000) StabilizingSamples = (int) Math.ceil(STABILIZERVALUE / prefGPSupdatefrequency);
+            if (prefGPSUpdateFrequency >= 1000) StabilizingSamples = (int) Math.ceil(STABILIZERVALUE / prefGPSUpdateFrequency);
             else StabilizingSamples = (int) Math.ceil(STABILIZERVALUE / 1000);
         }
     }
@@ -800,10 +809,10 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
             //Log.w("myApp", "[#] GPSApplication.java - updateGPSLocationFrequency");
             mlocManager.removeGpsStatusListener(this);
             mlocManager.removeUpdates(this);
-            if (prefGPSupdatefrequency >= 1000) StabilizingSamples = (int) Math.ceil(STABILIZERVALUE / prefGPSupdatefrequency);
+            if (prefGPSUpdateFrequency >= 1000) StabilizingSamples = (int) Math.ceil(STABILIZERVALUE / prefGPSUpdateFrequency);
             else StabilizingSamples = (int) Math.ceil(STABILIZERVALUE / 1000);
             mlocManager.addGpsStatusListener(this);
-            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, prefGPSupdatefrequency, 0, this);
+            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, prefGPSUpdateFrequency, 0, this);
         }
     }
 
@@ -932,7 +941,7 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
             case JOB_TYPE_DELETE:
                 break;
             case JOB_TYPE_EXPORT:
-                Ex = new Exporter(exportingTask, prefExportKML, prefExportGPX, prefExportTXT, Environment.getExternalStorageDirectory() + "/GPSLogger");
+                Ex = new Exporter(exportingTask, getPrefExportKML(), getPrefExportGPX(), getPrefExportTXT(), Environment.getExternalStorageDirectory() + "/GPSLogger");
                 Ex.start();
                 break;
             case JOB_TYPE_VIEW:
@@ -941,7 +950,7 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
                 Ex.start();
                 break;
             case JOB_TYPE_SHARE:
-                Ex = new Exporter(exportingTask, prefExportKML, prefExportGPX, prefExportTXT, Environment.getExternalStorageDirectory() + "/GPSLogger/AppData");
+                Ex = new Exporter(exportingTask, getPrefExportKML(), getPrefExportGPX(), getPrefExportTXT(), Environment.getExternalStorageDirectory() + "/GPSLogger/AppData");
                 Ex.start();
                 break;
             default:
@@ -1229,7 +1238,6 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
         }
 
         // ---------Remove the prefIsStoragePermissionChecked in preferences if present
-
         if (preferences.contains("prefIsStoragePermissionChecked")) {
             SharedPreferences.Editor editor = preferences.edit();
             editor.remove("prefIsStoragePermissionChecked");
@@ -1237,8 +1245,6 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
         }
 
         // -----------------------------------------------------------------------
-
-        //prefKeepScreenOn = preferences.getBoolean("prefKeepScreenOn", true);
         prefGPSWeekRolloverCorrected = preferences.getBoolean("prefGPSWeekRolloverCorrected", false);
         prefShowDecimalCoordinates = preferences.getBoolean("prefShowDecimalCoordinates", false);
         prefViewTracksWith = Integer.valueOf(preferences.getString("prefViewTracksWith", "0"));
@@ -1246,28 +1252,17 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
         prefGPSdistance = Float.valueOf(preferences.getString("prefGPSdistance", "0"));
         prefEGM96AltitudeCorrection = preferences.getBoolean("prefEGM96AltitudeCorrection", false);
         prefAltitudeCorrection = Double.valueOf(preferences.getString("prefAltitudeCorrection", "0"));
-            Log.w("myApp", "[#] GPSApplication.java - Manual Correction set to " + prefAltitudeCorrection + " m");
-        prefExportKML = preferences.getBoolean("prefExportKML", true);
-        prefExportGPX = preferences.getBoolean("prefExportGPX", true);
-        prefExportTXT = preferences.getBoolean("prefExportTXT", false);
+        Log.w("myApp", "[#] GPSApplication.java - Manual Correction set to " + prefAltitudeCorrection + " m");
         prefKMLAltitudeMode = Integer.valueOf(preferences.getString("prefKMLAltitudeMode", "1"));
-        prefGPXVersion = Integer.valueOf(preferences.getString("prefGPXVersion", "100"));               // Default value = v.1.0
+        prefGPXVersion = Integer.valueOf(preferences.getString("prefGPXVersion", "100")); // Default value = v.1.0
         prefShowTrackStatsType = Integer.valueOf(preferences.getString("prefShowTrackStatsType", "0"));
         prefShowDirections = Integer.valueOf(preferences.getString("prefShowDirections", "0"));
 
-        long oldGPSupdatefrequency = prefGPSupdatefrequency;
-        prefGPSupdatefrequency = Long.valueOf(preferences.getString("prefGPSupdatefrequency", "1000"));
+        long oldGPSUpdateFrequency = prefGPSUpdateFrequency;
+        prefGPSUpdateFrequency = Long.valueOf(preferences.getString("prefGPSupdatefrequency", "1000"));
 
         // ---------------------------------------------- Update the GPS Update Frequency if needed
-        if (oldGPSupdatefrequency != prefGPSupdatefrequency) updateGPSLocationFrequency();
-
-        // ---------------------------------------------------------------- If no Exportation formats are enabled, enable the GPX one
-        if (!prefExportKML && !prefExportGPX && !prefExportTXT) {
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putBoolean("prefExportGPX", true);
-            editor.commit();
-            prefExportGPX = true;
-        }
+        if (oldGPSUpdateFrequency != prefGPSUpdateFrequency) updateGPSLocationFrequency();
 
         // ---------------------------------------------------------------- Load EGM Grid if needed
         EGM96 egm96 = EGM96.getInstance();
@@ -1286,8 +1281,7 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
 
 
 // THE THREAD THAT DOES ASYNCHRONOUS OPERATIONS ---------------------------------------------------
-
-
+    
     class AsyncTODO {
         String TaskType;
         LocationExtended location;
@@ -1353,8 +1347,6 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
                         Log.w("myApp", "[#] GPSApplication.java - TASK_NEWTRACK: " + track.getId());
                         _currentTrack = track;
                         UpdateTrackList();
-
-                        // TODO: Export track to desired files using the Exporter (if exportOnNewTrack option is set to true).
                     } else Log.w("myApp", "[#] GPSApplication.java - TASK_NEWTRACK: Track " + track.getId() + " already empty (New track not created)");
                     _currentTrack = track;
                     EventBus.getDefault().post(EventBusMSG.UPDATE_TRACK);

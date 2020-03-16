@@ -289,9 +289,19 @@ public class GPSActivity extends AppCompatActivity {
                 // This is the second click
                 GPSApp.setNewTrackFlag(false);
                 GPSApp.setRecording(false);
+
+                if (GPSApp.getPrefFTPExportWhenDone())
+                {
+                    GPSApp.getCurrentTrack().setSelected(true);
+                    GPSApp.LoadJob(GPSApplication.JOB_TYPE_EXPORT);
+                    GPSApp.ExecuteJob();
+                    GPSApp.DeselectAllTracks();
+                }
+
                 EventBus.getDefault().post(EventBusMSG.NEW_TRACK);
                 ToastClickAgain.cancel();
                 Toast.makeText(this, getString(R.string.toast_track_saved_into_tracklist), Toast.LENGTH_SHORT).show();
+
             } else {
                 // This is the first click
                 GPSApp.setNewTrackFlag(true); // Start the timer
