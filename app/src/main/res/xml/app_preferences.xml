@@ -129,6 +129,12 @@
         android:title="@string/pref_category_exporting">
 
         <android.support.v7.preference.SwitchPreferenceCompat
+            android:key="prefExportWhenCompleted"
+            android:title="@string/pref_export_when_completed"
+            android:summary="@string/pref_export_when_completed_summary"
+            android:defaultValue="false" />
+
+        <android.support.v7.preference.SwitchPreferenceCompat
             android:key="prefExportTXT"
             android:title="@string/pref_export_TXT"
             android:summary="@string/pref_export_TXT_summary"
@@ -168,10 +174,10 @@
         android:title="@string/pref_category_FTP">
 
         <android.support.v7.preference.SwitchPreferenceCompat
-            android:key="prefFTPExportWhenDone"
-            android:title="@string/pref_FTP_transfer_track_when_done"
-            android:summary="@string/pref_FTP_transfer_track_when_done_summary"
-            android:defaultValue="false"/>
+            android:key="prefFTPTransferWhenCompleted"
+            android:title="@string/pref_FTP_transfer_when_completed"
+            android:summary="@string/pref_FTP_transfer_when_completed_summary"
+            android:defaultValue="false" />
 
         <android.support.v7.preference.EditTextPreference
             android:key="prefFTPHost"

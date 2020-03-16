@@ -28,6 +28,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatDelegate;
+import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.PreferenceFragmentCompat;
@@ -155,6 +156,20 @@ public class FragmentSettings extends PreferenceFragmentCompat {
 
                             PrefEGM96SetToFalse();
                         }
+                    }
+                }
+
+                if (key.equals("prefExportWhenCompleted")) {
+                    SwitchPreferenceCompat pFTPTransferWhenCompleted = (SwitchPreferenceCompat) findPreference("prefFTPTransferWhenCompleted");
+                    if (!sharedPreferences.getBoolean(key, false) && pFTPTransferWhenCompleted.isChecked()) {
+                        pFTPTransferWhenCompleted.setChecked(false);
+                    }
+                }
+
+                if (key.equals("prefFTPTransferWhenCompleted")) {
+                    SwitchPreferenceCompat pExportWhenCompleted = (SwitchPreferenceCompat) findPreference("prefExportWhenCompleted");
+                    if (sharedPreferences.getBoolean(key, false) && !pExportWhenCompleted.isChecked()) {
+                        pExportWhenCompleted.setChecked(true);
                     }
                 }
 

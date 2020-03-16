@@ -290,7 +290,7 @@ public class GPSActivity extends AppCompatActivity {
                 GPSApp.setNewTrackFlag(false);
                 GPSApp.setRecording(false);
 
-                if (GPSApp.getPrefFTPExportWhenDone())
+                if (GPSApp.getPrefExportWhenCompleted())
                 {
                     GPSApp.getCurrentTrack().setSelected(true);
                     GPSApp.LoadJob(GPSApplication.JOB_TYPE_EXPORT);

@@ -484,9 +484,14 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
         return prefShowDirections;
     }
 
-    public boolean getPrefFTPExportWhenDone() {
+    public boolean getPrefFTPTransferWhenCompleted() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        return preferences.getBoolean("prefFTPExportWhenDone", false);
+        return preferences.getBoolean("prefFTPTransferWhenCompleted", false);
+    }
+
+    public boolean getPrefExportWhenCompleted() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return preferences.getBoolean("prefExportWhenCompleted", false);
     }
 
     public LocationExtended getCurrentLocationExtended() {
@@ -1281,7 +1286,7 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
 
 
 // THE THREAD THAT DOES ASYNCHRONOUS OPERATIONS ---------------------------------------------------
-    
+
     class AsyncTODO {
         String TaskType;
         LocationExtended location;
