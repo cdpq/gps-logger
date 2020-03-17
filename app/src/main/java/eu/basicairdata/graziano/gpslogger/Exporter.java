@@ -22,6 +22,8 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -616,7 +618,6 @@ class Exporter extends Thread {
                 KMLfw.close();
 
                 // TODO: Transfert file via FTP to CDPQ FTP location when exported as kml (if sendToCDPQOnExport is set to true).
-                new TransferFileViaFTP().execute(KMLfile);
             }
             if (ExportGPX) {
                 GPXbw.write("</gpx>");
@@ -633,8 +634,10 @@ class Exporter extends Thread {
                 // TODO: Transfert file via FTP to CDPQ FTP location when exported as txt (if sendToCDPQOnExport is set to true).
             }
 
+            track.setExported(true);
+            GPSApp.GPSDataBase.updateTrack(track);
             Log.w("myApp", "[#] Exporter.java - Track "+ track.getId() +" exported in " + (System.currentTimeMillis() - start_Time) + " ms (" + elements_total + " pts @ " + ((1000L * elements_total) / (System.currentTimeMillis() - start_Time)) + " pts/s)");
-            //EventBus.getDefault().post(new EventBusMSGNormal(EventBusMSG.TRACK_EXPORTED, track.getId()));
+            //EventBus.getDefault().post(new EventBusMSGNormal(EventBusMSG.REFRESH_TRACKLIST, track.getId()));
             exportingTask.setStatus(ExportingTask.STATUS_ENDED_SUCCESS);
         } catch (IOException e) {
             exportingTask.setStatus(ExportingTask.STATUS_ENDED_FAILED);

@@ -97,6 +97,9 @@ public class Track {
     private long    NumberOfLocations           = 0;                // Saved in DB
     private long    NumberOfPlacemarks          = 0;                // Saved in DB
 
+    private int Exported                        = 0;            // Saved in DB
+    private int Transferred                     = 0;            // Saved in DB
+
     private int ValidMap                        = 1;                // Saved in DB
     // 1 = Map extents valid, OK generation of Thumb
     // 0 = Do not generate thumb (track crosses antimeridian)
@@ -297,7 +300,7 @@ public class Track {
                        long DistanceLastAltitude, double Altitude_Up, double Altitude_Down,
                        double Altitude_InProgress, float SpeedMax, float   SpeedAverage,
                        float SpeedAverageMoving, long NumberOfLocations, long NumberOfPlacemarks,
-                       int ValidMap, int Type) {
+                       int ValidMap, int Exported, int Transferred, int Type) {
         this.id = id;
         this.Name = Name;
 
@@ -349,6 +352,8 @@ public class Track {
         this.NumberOfPlacemarks = NumberOfPlacemarks;
 
         this.ValidMap = ValidMap;
+        this.Exported = Exported; // SQLiteDatabase don't have a boolean data type, so we convert an integer like so
+        this.Transferred = Transferred; // SQLiteDatabase don't have a boolean data type, so we convert an integer like so
         this.Type = Type;
 
         EGM96 egm96 = EGM96.getInstance();
@@ -544,6 +549,22 @@ public class Track {
 
     public long getNumberOfPlacemarks() {
         return NumberOfPlacemarks;
+    }
+
+    public boolean getExported() {
+        return Exported > 0;
+    }
+
+    public void setExported(boolean value) {
+        this.Exported = value ? 1 : 0;
+    }
+
+    public boolean getTransferred() {
+        return Transferred > 0;
+    }
+
+    public void setTransferred(boolean value) {
+        this.Transferred = value ? 1 : 0;
     }
 
     public int getValidMap() {

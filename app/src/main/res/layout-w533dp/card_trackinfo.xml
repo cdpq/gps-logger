@@ -67,14 +67,47 @@
             android:paddingBottom="7dp"
             android:background="@color/colorCardBackground_Title">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/textColorCardTitle"
-                android:id="@+id/id_textView_card_TrackName"
-                android:textStyle="bold"
-                android:paddingTop="1dp" />
+                android:orientation="horizontal"
+                android:id="@+id/id_card_mainInfo"
+                android:paddingTop="1dp" >
+
+                <!-- Last four lines are for the ellipses -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/textColorCardTitle"
+                    android:id="@+id/id_textView_card_TrackName"
+                    android:textStyle="bold"
+                    android:maxWidth="345dp"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
+                    android:maxLines="1" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:id="@+id/id_textView_card_Exported"
+                    android:textColor="@color/textColorCardTrackExported"
+                    android:textStyle="bold"
+                    android:text="@string/card_mainInfo_TrackExported"
+                    android:layout_marginLeft="10dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:id="@+id/id_textView_card_Transferred"
+                    android:textColor="@color/textColorCardTrackTransferred"
+                    android:textStyle="bold"
+                    android:text="@string/card_mainInfo_TrackTransferred"
+                    android:layout_marginLeft="10dp" />
+
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -83,7 +116,7 @@
                 android:id="@+id/id_textView_card_TrackDesc"
                 android:textStyle="italic"
                 android:paddingBottom="2dp"
-                android:layout_below="@id/id_textView_card_TrackName"/>
+                android:layout_below="@id/id_card_mainInfo"/>
         </RelativeLayout>
 
         <ImageView

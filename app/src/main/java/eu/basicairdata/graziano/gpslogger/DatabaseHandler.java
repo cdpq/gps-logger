@@ -26,6 +26,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
 import android.util.Log;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,7 +40,7 @@ class DatabaseHandler extends SQLiteOpenHelper {
 
     // All Static variables
     // Database Version
-    private static final int DATABASE_VERSION = 2;          // Updated to 2 in v2.1.3 (code 14)
+    private static final int DATABASE_VERSION = 5;          // Updated up to 5 in v3.0.0
     private static final int LOCATION_TYPE_LOCATION = 1;
     private static final int LOCATION_TYPE_PLACEMARK = 2;
 
@@ -124,6 +126,8 @@ class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_TRACK_NUMBEROFPLACEMARKS = "number_of_placemarks";
     private static final String KEY_TRACK_TYPE = "type";
 
+    private static final String KEY_TRACK_EXPORTED = "exported";
+    private static final String KEY_TRACK_TRANSFERRED = "transferred";
     private static final String KEY_TRACK_VALIDMAP = "validmap";
 
 
@@ -176,7 +180,9 @@ class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_TRACK_NUMBEROFLOCATIONS + " INTEGER,"         // 37
                 + KEY_TRACK_NUMBEROFPLACEMARKS + " INTEGER,"        // 38
                 + KEY_TRACK_VALIDMAP + " INTEGER,"                  // 39
-                + KEY_TRACK_TYPE + " INTEGER " + ")";               // 40
+                + KEY_TRACK_EXPORTED + " INTEGER,"                  // 40
+                + KEY_TRACK_TRANSFERRED + " INTEGER,"               // 41
+                + KEY_TRACK_TYPE + " INTEGER " + ")";               // 42
         db.execSQL(CREATE_TRACKS_TABLE);
 
         String CREATE_LOCATIONS_TABLE = "CREATE TABLE " + TABLE_LOCATIONS + "("
@@ -220,6 +226,10 @@ class DatabaseHandler extends SQLiteOpenHelper {
             + TABLE_LOCATIONS + " ADD COLUMN " + KEY_LOCATION_NUMBEROFSATELLITESUSEDINFIX + " INTEGER DEFAULT " +  NOT_AVAILABLE + ";";
     private static final String DATABASE_ALTER_TABLE_PLACEMARKS_TO_V2 = "ALTER TABLE "
             + TABLE_PLACEMARKS + " ADD COLUMN " + KEY_LOCATION_NUMBEROFSATELLITESUSEDINFIX + " INTEGER DEFAULT " +  NOT_AVAILABLE + ";";
+    private static final String DATABASE_ALTER_TABLE_TRACKS_TO_V3 = "ALTER TABLE "
+            + TABLE_TRACKS + " ADD COLUMN " + KEY_TRACK_EXPORTED + " INTEGER DEFAULT " + "0" + ";";
+    private static final String DATABASE_ALTER_TABLE_TRACKS_TO_V5 = "ALTER TABLE "
+            + TABLE_TRACKS + " ADD COLUMN " + KEY_TRACK_TRANSFERRED + " INTEGER DEFAULT " + "0" + ";";
 
     // Upgrading database
     @Override
@@ -242,14 +252,20 @@ class DatabaseHandler extends SQLiteOpenHelper {
                 //Log.w("myApp", "[#] DatabaseHandler.java - onUpgrade: from version 1 to 2 ...");
                 db.execSQL(DATABASE_ALTER_TABLE_LOCATIONS_TO_V2);
                 db.execSQL(DATABASE_ALTER_TABLE_PLACEMARKS_TO_V2);
-            //case 2:
+            case 2:
                 //upgrade from version 2 to 3
-            //    db.execSQL(DATABASE_ALTER_TEAM_TO_V3);
+                db.execSQL(DATABASE_ALTER_TABLE_TRACKS_TO_V3);
+            case 3:
+                //upgrade from version 3 to 4
+                //Was doing some tests, that's why there's nothing here
+            case 4:
+                //upgrade from version 4 to 5
+                db.execSQL(DATABASE_ALTER_TABLE_TRACKS_TO_V5);
 
                 //and so on.. do not add breaks so that switch will
                 //start at oldVersion, and run straight through to the latest
         }
-        //Log.w("myApp", "[#] DatabaseHandler.java - onUpgrade: DB upgraded to version " + newVersion);
+        Log.w("myApp", "[#] DatabaseHandler.java - onUpgrade: DB upgraded to version " + newVersion);
     }
 
 // ----------------------------------------------------------------------- LOCATIONS AND PLACEMARKS
@@ -274,65 +290,10 @@ class DatabaseHandler extends SQLiteOpenHelper {
         locvalues.put(KEY_LOCATION_TYPE, LOCATION_TYPE_LOCATION);
         locvalues.put(KEY_LOCATION_NUMBEROFSATELLITESUSEDINFIX, location.getNumberOfSatellitesUsedInFix());
 
-        ContentValues trkvalues = new ContentValues();
-        trkvalues.put(KEY_TRACK_NAME, track.getName());
-        trkvalues.put(KEY_TRACK_FROM, "");
-        trkvalues.put(KEY_TRACK_TO, "");
-
-        trkvalues.put(KEY_TRACK_START_LATITUDE, track.getStart_Latitude());
-        trkvalues.put(KEY_TRACK_START_LONGITUDE, track.getStart_Longitude());
-        trkvalues.put(KEY_TRACK_START_ALTITUDE, track.getStart_Altitude());
-        trkvalues.put(KEY_TRACK_START_ACCURACY, track.getStart_Accuracy());
-        trkvalues.put(KEY_TRACK_START_SPEED, track.getStart_Speed());
-        trkvalues.put(KEY_TRACK_START_TIME, track.getStart_Time());
-
-        trkvalues.put(KEY_TRACK_LASTFIX_TIME, track.getLastFix_Time());
-
-        trkvalues.put(KEY_TRACK_END_LATITUDE, track.getEnd_Latitude());
-        trkvalues.put(KEY_TRACK_END_LONGITUDE, track.getEnd_Longitude());
-        trkvalues.put(KEY_TRACK_END_ALTITUDE, track.getEnd_Altitude());
-        trkvalues.put(KEY_TRACK_END_ACCURACY, track.getEnd_Accuracy());
-        trkvalues.put(KEY_TRACK_END_SPEED, track.getEnd_Speed());
-        trkvalues.put(KEY_TRACK_END_TIME, track.getEnd_Time());
-
-        trkvalues.put(KEY_TRACK_LASTSTEPDST_LATITUDE, track.getLastStepDistance_Latitude());
-        trkvalues.put(KEY_TRACK_LASTSTEPDST_LONGITUDE, track.getLastStepDistance_Longitude());
-        trkvalues.put(KEY_TRACK_LASTSTEPDST_ACCURACY, track.getLastStepDistance_Accuracy());
-
-        trkvalues.put(KEY_TRACK_LASTSTEPALT_ALTITUDE, track.getLastStepAltitude_Altitude());
-        trkvalues.put(KEY_TRACK_LASTSTEPALT_ACCURACY, track.getLastStepAltitude_Accuracy());
-
-        trkvalues.put(KEY_TRACK_MIN_LATITUDE, track.getMin_Latitude());
-        trkvalues.put(KEY_TRACK_MIN_LONGITUDE, track.getMin_Longitude());
-
-        trkvalues.put(KEY_TRACK_MAX_LATITUDE, track.getMax_Latitude());
-        trkvalues.put(KEY_TRACK_MAX_LONGITUDE, track.getMax_Longitude());
-
-        trkvalues.put(KEY_TRACK_DURATION, track.getDuration());
-        trkvalues.put(KEY_TRACK_DURATION_MOVING, track.getDuration_Moving());
-
-        trkvalues.put(KEY_TRACK_DISTANCE, track.getDistance());
-        trkvalues.put(KEY_TRACK_DISTANCE_INPROGRESS, track.getDistanceInProgress());
-        trkvalues.put(KEY_TRACK_DISTANCE_LASTALTITUDE, track.getDistanceLastAltitude());
-
-        trkvalues.put(KEY_TRACK_ALTITUDE_UP, track.getAltitude_Up());
-        trkvalues.put(KEY_TRACK_ALTITUDE_DOWN, track.getAltitude_Down());
-        trkvalues.put(KEY_TRACK_ALTITUDE_INPROGRESS, track.getAltitude_InProgress());
-
-        trkvalues.put(KEY_TRACK_SPEED_MAX, track.getSpeedMax());
-        trkvalues.put(KEY_TRACK_SPEED_AVERAGE, track.getSpeedAverage());
-        trkvalues.put(KEY_TRACK_SPEED_AVERAGEMOVING, track.getSpeedAverageMoving());
-
-        trkvalues.put(KEY_TRACK_NUMBEROFLOCATIONS, track.getNumberOfLocations());
-        trkvalues.put(KEY_TRACK_NUMBEROFPLACEMARKS, track.getNumberOfPlacemarks());
-        trkvalues.put(KEY_TRACK_TYPE, track.getType());
-
-        trkvalues.put(KEY_TRACK_VALIDMAP, track.getValidMap());
+        updateTrack(track);
 
         db.beginTransaction();
-        db.insert(TABLE_LOCATIONS, null, locvalues);                // Insert the new Location
-        db.update(TABLE_TRACKS, trkvalues, KEY_ID + " = ?",
-                new String[] { String.valueOf(track.getId()) });    // Update the corresponding Track
+        db.insert(TABLE_LOCATIONS, null, locvalues);
         db.setTransactionSuccessful();
         db.endTransaction();
 
@@ -361,6 +322,20 @@ class DatabaseHandler extends SQLiteOpenHelper {
         locvalues.put(KEY_LOCATION_NAME, placemark.getDescription());
         locvalues.put(KEY_LOCATION_NUMBEROFSATELLITESUSEDINFIX, placemark.getNumberOfSatellitesUsedInFix());
 
+        updateTrack(track);
+
+        db.beginTransaction();
+        db.insert(TABLE_PLACEMARKS, null, locvalues);
+        db.setTransactionSuccessful();
+        db.endTransaction();
+
+        //Log.w("myApp", "[#] DatabaseHandler.java - addLocation: Location " + track.getNumberOfLocations() + " added into track " + track.getID());
+    }
+
+    public void updateTrack(Track track)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+
         ContentValues trkvalues = new ContentValues();
         trkvalues.put(KEY_TRACK_NAME, track.getName());
         trkvalues.put(KEY_TRACK_FROM, "");
@@ -414,18 +389,16 @@ class DatabaseHandler extends SQLiteOpenHelper {
         trkvalues.put(KEY_TRACK_NUMBEROFPLACEMARKS, track.getNumberOfPlacemarks());
         trkvalues.put(KEY_TRACK_TYPE, track.getType());
 
+        trkvalues.put(KEY_TRACK_EXPORTED, track.getExported());
+        trkvalues.put(KEY_TRACK_TRANSFERRED, track.getTransferred());
         trkvalues.put(KEY_TRACK_VALIDMAP, track.getValidMap());
 
         db.beginTransaction();
-        db.insert(TABLE_PLACEMARKS, null, locvalues);                // Insert the new Location
         db.update(TABLE_TRACKS, trkvalues, KEY_ID + " = ?",
                 new String[] { String.valueOf(track.getId()) });    // Update the corresponding Track
         db.setTransactionSuccessful();
         db.endTransaction();
-
-        //Log.w("myApp", "[#] DatabaseHandler.java - addLocation: Location " + track.getNumberOfLocations() + " added into track " + track.getID());
     }
-
 
     // Get single Location
     public LocationExtended getLocation(long id) {
@@ -756,6 +729,8 @@ class DatabaseHandler extends SQLiteOpenHelper {
         trkvalues.put(KEY_TRACK_NUMBEROFPLACEMARKS, track.getNumberOfPlacemarks());
         trkvalues.put(KEY_TRACK_TYPE, track.getType());
 
+        trkvalues.put(KEY_TRACK_EXPORTED, track.getExported());
+        trkvalues.put(KEY_TRACK_TRANSFERRED, track.getTransferred());
         trkvalues.put(KEY_TRACK_VALIDMAP, track.getValidMap());
 
         long TrackID;
@@ -838,7 +813,9 @@ class DatabaseHandler extends SQLiteOpenHelper {
                         cursor.getLong(38),
 
                         cursor.getInt(39),
-                        cursor.getInt(40));
+                        cursor.getInt(40),
+                        cursor.getInt(41),
+                        cursor.getInt(42));
             }
             cursor.close();
         }
@@ -948,7 +925,9 @@ class DatabaseHandler extends SQLiteOpenHelper {
                             cursor.getLong(38),
 
                             cursor.getInt(39),
-                            cursor.getInt(40));
+                            cursor.getInt(40),
+                            cursor.getInt(41),
+                            cursor.getInt(42));
 
                     trackList.add(trk);             // Add Track to list
                 } while (cursor.moveToNext());

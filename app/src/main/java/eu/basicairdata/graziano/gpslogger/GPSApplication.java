@@ -821,7 +821,7 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
         }
     }
 
-    public void updateSats() {
+    public void updateStats() {
         try {
             if ((mlocManager != null) && (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
                 GpsStatus gs = mlocManager.getGpsStatus(null);
@@ -1053,7 +1053,7 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
                 // TODO: get here the status of the GPS, and save into a GpsStatus to be used for satellites visualization;
                 // Use GpsStatus getGpsStatus (GpsStatus status)
                 // https://developer.android.com/reference/android/location/LocationManager.html#getGpsStatus(android.location.GpsStatus)
-                updateSats();
+                updateStats();
                 break;
         }
     }
