@@ -67,9 +67,9 @@
             android:paddingBottom="7dp"
             android:background="@color/colorCardBackground_Title">
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="24dp"
                 android:orientation="horizontal"
                 android:id="@+id/id_card_mainInfo"
                 android:paddingTop="1dp" >
@@ -87,29 +87,41 @@
                     android:ellipsize="end"
                     android:maxLines="1" />
 
-                <TextView
-                    android:id="@+id/id_textView_card_Exported"
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:text="@string/card_mainInfo_TrackExported"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="@color/textColorCardTrackExported"
-                    android:textStyle="bold"
-                    android:visibility="gone" />
+                    android:layout_height="match_parent"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true">
 
-                <TextView
-                    android:id="@+id/id_textView_card_Transferred"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:text="@string/card_mainInfo_TrackTransferred"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="@color/textColorCardTrackTransferred"
-                    android:textStyle="bold"
-                    android:visibility="gone" />
+                    <ImageView
+                        android:id="@+id/id_imageView_card_Transferred"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginLeft="5dp"
+                        android:clickable="false"
+                        android:src="@mipmap/ic_send_white_24dp"
+                        android:layout_alignLeft="@id/id_imageView_card_Exported"
+                        android:visibility="gone" />
 
-            </LinearLayout>
+                    <ImageView
+                        android:id="@+id/id_imageView_card_Exported"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginLeft="5dp"
+                        android:clickable="false"
+                        android:src="@mipmap/ic_export_white_24dp"
+                        android:layout_alignRight="@id/id_imageView_card_tracktype"
+                        android:visibility="gone" />
+
+                    <ImageView
+                        android:id="@+id/id_imageView_card_tracktype"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginLeft="5dp"
+                        android:clickable="false" />
+                </LinearLayout>
+
+            </RelativeLayout>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -120,15 +132,6 @@
                 android:paddingBottom="2dp"
                 android:layout_below="@id/id_card_mainInfo"/>
         </RelativeLayout>
-
-        <ImageView
-            android:id="@+id/id_imageView_card_tracktype"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_margin="7dp"
-            android:clickable="false"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true" />
 
         <View
             android:layout_width="match_parent"

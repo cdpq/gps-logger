@@ -25,15 +25,6 @@
     android:orientation="vertical"
     tools:context="eu.basicairdata.graziano.gpslogger.FragmentTracklist">
 
-    <android.widget.Button
-        android:id="@+id/id_tracklist_transferButton"
-        android:layout_width="fill_parent"
-        android:layout_height="60dp"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:gravity="center"
-        android:text="@string/tracklist_button_cdpq"
-        android:backgroundTint="@color/colorPrimary" />
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/my_recycler_view"
         android:layout_width="match_parent"

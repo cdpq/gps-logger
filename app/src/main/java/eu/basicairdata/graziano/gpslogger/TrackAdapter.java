@@ -23,7 +23,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.ColorMatrixColorFilter;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +35,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import org.greenrobot.eventbus.EventBus;
-import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -83,8 +81,8 @@ class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackHolder> {
         private final CardView card;
         private final TextView textViewTrackName;
         private final TextView textViewTrackDescription;
-        private final TextView textViewTrackExported;
-        private final TextView textViewTrackTransferred;
+        private final ImageView imageViewTrackExported;
+        private final ImageView imageViewTrackTransferred;
         private final TextView textViewTrackLength;
         private final TextView textViewTrackDuration;
         private final TextView textViewTrackAltitudeGap;
@@ -119,8 +117,8 @@ class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackHolder> {
             // TextViews
             textViewTrackName           = itemView.findViewById(R.id.id_textView_card_TrackName);
             textViewTrackDescription    = itemView.findViewById(R.id.id_textView_card_TrackDesc);
-            textViewTrackExported       = itemView.findViewById(R.id.id_textView_card_Exported);
-            textViewTrackTransferred    = itemView.findViewById(R.id.id_textView_card_Transferred);
+            imageViewTrackExported      = itemView.findViewById(R.id.id_imageView_card_Exported);
+            imageViewTrackTransferred   = itemView.findViewById(R.id.id_imageView_card_Transferred);
             textViewTrackLength         = itemView.findViewById(R.id.id_textView_card_length);
             textViewTrackDuration       = itemView.findViewById(R.id.id_textView_card_duration);
             textViewTrackAltitudeGap    = itemView.findViewById(R.id.id_textView_card_altitudegap);
@@ -145,8 +143,8 @@ class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackHolder> {
         void UpdateTrackStats(Track trk) {
             //textViewTrackName.setText(trk.getName());
 
-            textViewTrackExported.setVisibility(trk.getExported() ? View.VISIBLE : View.GONE);
-            textViewTrackTransferred.setVisibility(trk.getTransferred() ? View.VISIBLE : View.GONE);
+            imageViewTrackExported.setVisibility(trk.getExported() ? View.VISIBLE : View.GONE);
+            imageViewTrackTransferred.setVisibility(trk.getTransferred() ? View.VISIBLE : View.GONE);
 
             if (trk.getNumberOfLocations() >= 1) {
                 phd = phdformatter.format(trk.getEstimatedDistance(),PhysicalDataFormatter.FORMAT_DISTANCE);
@@ -198,8 +196,8 @@ class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackHolder> {
             textViewTrackName.setText(track.getName());
             textViewTrackDescription.setText(GPSApplication.getInstance().getString(R.string.track_id) + " " + track.getId());
 
-            textViewTrackExported.setVisibility(track.getExported() ? View.VISIBLE : View.GONE);
-            textViewTrackTransferred.setVisibility(track.getTransferred() ? View.VISIBLE : View.GONE);
+            imageViewTrackExported.setVisibility(track.getExported() ? View.VISIBLE : View.GONE);
+            imageViewTrackTransferred.setVisibility(track.getTransferred() ? View.VISIBLE : View.GONE);
 
             if (trk.getNumberOfLocations() >= 1) {
                 phd = phdformatter.format(track.getEstimatedDistance(),PhysicalDataFormatter.FORMAT_DISTANCE);

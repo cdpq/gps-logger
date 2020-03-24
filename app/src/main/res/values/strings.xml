@@ -95,10 +95,7 @@
 
     <!-- Tracklist -->
     <string name="tracklist_empty">Tracklist Empty</string>
-    <string name="tracklist_button_cdpq">Send all to CDPQ</string>
 
-    <string name="card_mainInfo_TrackExported">EXP.</string>
-    <string name="card_mainInfo_TrackTransferred">TRA.</string>
     <string name="card_trackinfo_length">Length</string>
     <string name="card_trackinfo_duration">Duration</string>
     <string name="card_trackinfo_altitude_gap">Alt gap</string>
