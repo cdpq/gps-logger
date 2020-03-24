@@ -88,24 +88,26 @@
                     android:maxLines="1" />
 
                 <TextView
+                    android:id="@+id/id_textView_card_Exported"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/card_mainInfo_TrackExported"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:id="@+id/id_textView_card_Exported"
                     android:textColor="@color/textColorCardTrackExported"
                     android:textStyle="bold"
-                    android:text="@string/card_mainInfo_TrackExported"
-                    android:layout_marginLeft="10dp" />
+                    android:visibility="gone" />
 
                 <TextView
+                    android:id="@+id/id_textView_card_Transferred"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/card_mainInfo_TrackTransferred"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:id="@+id/id_textView_card_Transferred"
                     android:textColor="@color/textColorCardTrackTransferred"
                     android:textStyle="bold"
-                    android:text="@string/card_mainInfo_TrackTransferred"
-                    android:layout_marginLeft="10dp" />
+                    android:visibility="gone" />
 
             </LinearLayout>
 

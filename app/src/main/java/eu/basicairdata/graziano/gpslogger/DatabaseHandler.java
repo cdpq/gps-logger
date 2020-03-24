@@ -180,9 +180,9 @@ class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_TRACK_NUMBEROFLOCATIONS + " INTEGER,"         // 37
                 + KEY_TRACK_NUMBEROFPLACEMARKS + " INTEGER,"        // 38
                 + KEY_TRACK_VALIDMAP + " INTEGER,"                  // 39
-                + KEY_TRACK_EXPORTED + " INTEGER,"                  // 40
-                + KEY_TRACK_TRANSFERRED + " INTEGER,"               // 41
-                + KEY_TRACK_TYPE + " INTEGER " + ")";               // 42
+                + KEY_TRACK_TYPE + " INTEGER, "                     // 40
+                + KEY_TRACK_EXPORTED + " INTEGER,"                  // 41
+                + KEY_TRACK_TRANSFERRED + " INTEGER" + ")";         // 42
         db.execSQL(CREATE_TRACKS_TABLE);
 
         String CREATE_LOCATIONS_TABLE = "CREATE TABLE " + TABLE_LOCATIONS + "("

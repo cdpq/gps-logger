@@ -97,14 +97,14 @@ public class Track {
     private long    NumberOfLocations           = 0;                // Saved in DB
     private long    NumberOfPlacemarks          = 0;                // Saved in DB
 
-    private int Exported                        = 0;            // Saved in DB
-    private int Transferred                     = 0;            // Saved in DB
-
     private int ValidMap                        = 1;                // Saved in DB
     // 1 = Map extents valid, OK generation of Thumb
     // 0 = Do not generate thumb (track crosses antimeridian)
 
     private int Type = TRACK_TYPE_ND;                               // Saved in DB
+
+    private int Exported                        = 0;            // Saved in DB
+    private int Transferred                     = 0;            // Saved in DB
 
     // True if the card view is selected
     private boolean Selected = false;
@@ -300,7 +300,7 @@ public class Track {
                        long DistanceLastAltitude, double Altitude_Up, double Altitude_Down,
                        double Altitude_InProgress, float SpeedMax, float   SpeedAverage,
                        float SpeedAverageMoving, long NumberOfLocations, long NumberOfPlacemarks,
-                       int ValidMap, int Exported, int Transferred, int Type) {
+                       int ValidMap, int Type, int Exported, int Transferred) {
         this.id = id;
         this.Name = Name;
 
@@ -352,9 +352,10 @@ public class Track {
         this.NumberOfPlacemarks = NumberOfPlacemarks;
 
         this.ValidMap = ValidMap;
-        this.Exported = Exported; // SQLiteDatabase don't have a boolean data type, so we convert an integer like so
-        this.Transferred = Transferred; // SQLiteDatabase don't have a boolean data type, so we convert an integer like so
         this.Type = Type;
+
+        this.Exported = Exported;
+        this.Transferred = Transferred;
 
         EGM96 egm96 = EGM96.getInstance();
         if (egm96 != null) {
