@@ -50,6 +50,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -227,8 +228,10 @@ public class FragmentSettings extends PreferenceFragmentCompat {
         ListPreference pShowDirections = (ListPreference) findPreference("prefShowDirections");
         ListPreference pViewTracksWith = (ListPreference) findPreference("prefViewTracksWith");
         ListPreference pColorTheme = (ListPreference) findPreference("prefColorTheme");
+        ListPreference pFTPEncryption = (ListPreference) findPreference(GPSApplication.getInstance().getResources().getString(R.string.key_prefs_ftp_encryption));
         EditTextPreference pAltitudeCorrection = (EditTextPreference) findPreference("prefAltitudeCorrectionRaw");
         EditTextPreference pFTPHost = (EditTextPreference) findPreference("prefFTPHost");
+        EditTextPreference pFTPPort = (EditTextPreference) findPreference(GPSApplication.getInstance().getResources().getString(R.string.key_prefs_ftp_port));
         EditTextPreference pFTPUser = (EditTextPreference) findPreference("prefFTPUser");
         EditTextPreference pFTPPassword = (EditTextPreference) findPreference("prefFTPPassword");
         EditTextPreference pFTPPath = (EditTextPreference) findPreference("prefFTPPath");
@@ -267,7 +270,9 @@ public class FragmentSettings extends PreferenceFragmentCompat {
         pShowTrackStatsType.setSummary(pShowTrackStatsType.getEntry());
         pShowDirections.setSummary(pShowDirections.getEntry());
         pViewTracksWith.setSummary(pViewTracksWith.getEntry());
+        pFTPEncryption.setSummary(pFTPEncryption.getEntry());
         pFTPHost.setSummary(pFTPHost.getText());
+        pFTPPort.setSummary(pFTPPort.getText());
         pFTPUser.setSummary(pFTPUser.getText());
         pFTPPassword.setSummary(pFTPPassword.getText());
         pFTPPath.setSummary(pFTPPath.getText());

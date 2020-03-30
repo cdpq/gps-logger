@@ -230,6 +230,14 @@ public class FragmentTracklist extends Fragment {
             GPSApplication.getInstance().DeselectAllTracks();
             return;
         }
+        if (msg == EventBusMSG.ACTION_BULK_SEND_FTP_TRACKS) {
+            GPSApplication.getInstance().LoadJob(GPSApplication.JOB_TYPE_SEND_FTP);
+            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                CheckStoragePermission();   // Ask for storage permission
+            } else GPSApplication.getInstance().ExecuteJob();
+            GPSApplication.getInstance().DeselectAllTracks();
+            return;
+        }
         if (msg == EventBusMSG.ACTION_BULK_DELETE_TRACKS) {
             final ArrayList<Track> selectedTracks = GPSApplication.getInstance().getSelectedTracks();
 

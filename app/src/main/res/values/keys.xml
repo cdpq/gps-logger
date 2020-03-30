@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ strings.xml
+  ~ Created by G.Capelli (BasicAirData) on 8/5/2016
+  ~ Modified by Anthony Blanchette-Potvin on 30/3/2020
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+    <string name="key_prefs_ftp_transfer_when_completed">prefFTPTransferWhenCompleted</string>
+    <string name="key_prefs_ftp_host">prefFTPHost</string>
+    <string name="key_prefs_ftp_port">prefFTPPort</string>
+    <string name="key_prefs_ftp_user">prefFTPUser</string>
+    <string name="key_prefs_ftp_password">prefFTPPassword</string>
+    <string name="key_prefs_ftp_path">prefFTPPath</string>
+    <string name="key_prefs_ftp_encryption">prefFTPEncryption</string>
+</resources>

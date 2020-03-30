@@ -616,22 +616,16 @@ class Exporter extends Thread {
 
                 KMLbw.close();
                 KMLfw.close();
-
-                // TODO: Transfert file via FTP to CDPQ FTP location when exported as kml (if sendToCDPQOnExport is set to true).
             }
             if (ExportGPX) {
                 GPXbw.write("</gpx>");
 
                 GPXbw.close();
                 GPXfw.close();
-
-                // TODO: Transfert file via FTP to CDPQ FTP location when exported as gpx (if sendToCDPQOnExport is set to true).
             }
             if (ExportTXT) {
                 TXTbw.close();
                 TXTfw.close();
-
-                // TODO: Transfert file via FTP to CDPQ FTP location when exported as txt (if sendToCDPQOnExport is set to true).
             }
 
             track.setExported(true);
@@ -648,30 +642,6 @@ class Exporter extends Thread {
             exportingTask.setStatus(ExportingTask.STATUS_ENDED_FAILED);
             asyncGeopointsLoader.interrupt();
             Log.w("myApp", "[#] Exporter.java - Interrupted: " + e);
-        }
-    }
-
-    private class TransferFileViaFTP extends AsyncTask<File, Void, Boolean>
-    {
-        @Override
-        protected Boolean doInBackground(File... files) {
-
-            if (files == null)
-            {
-                Log.w("myApp", "doInBackground: error: \"params\" is null.");
-                return false;
-            }
-
-            if (files.length == 0)
-            {
-                Log.w("myApp", "doInBackground: error: \"params\" is empty.");
-                return false;
-            }
-
-            Log.w("myApp", "doInBackground: error: Transferring \"" + files[0].getName() + "\"...");
-
-
-            return true;
         }
     }
 

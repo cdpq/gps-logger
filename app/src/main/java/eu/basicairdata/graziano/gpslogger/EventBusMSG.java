@@ -36,6 +36,8 @@ public class EventBusMSG {
     static final short NOTIFY_TRACKS_DELETED            =  14;  // Notify that some tracks are deleted
     static final short UPDATE_ACTIONBAR                 =  15;  // Notify that the actionbar must be updated
     static final short REFRESH_TRACKLIST                =  16;  // Refresh the tracklist, without update it from DB
+    static final short TOAST_TRACK_SEND_FTP_SUCCESS     =  17;  // The FTPTransferThread has successfully sent the tracks, show toast
+    static final short TOAST_TRACK_SEND_FTP_FAILED      =  18;  // The FTPTransferThread has failed to send the tracks, show toast
 
     static final short TRACKLIST_DESELECT               =  24;  // The user deselect (into the tracklist) the track with a given id
     static final short TRACKLIST_SELECT                 =  25;  // The user select (into the tracklist) the track with a given id
@@ -46,4 +48,5 @@ public class EventBusMSG {
     static final short ACTION_BULK_EXPORT_TRACKS        =  41;  // Export the selected tracks
     static final short ACTION_BULK_VIEW_TRACKS          =  42;  // View the selected tracks
     static final short ACTION_BULK_SHARE_TRACKS         =  43;  // Share the selected tracks
+    static final short ACTION_BULK_SEND_FTP_TRACKS      =  44;  // Send, via FTP, the selected tracks
 }

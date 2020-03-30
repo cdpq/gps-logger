@@ -20,9 +20,11 @@ package eu.basicairdata.graziano.gpslogger;
 
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import java.io.File;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 
@@ -34,6 +36,10 @@ public class Track {
     private static final float MOVEMENT_SPEED_THRESHOLD = 0.5f;     // The minimum speed (in m/s) to consider the user in movement
     private static final float STANDARD_ACCURACY = 10.0f;
     private static final float SECURITY_COEFF = 1.7f;
+
+    public static final int FILE_TYPE_TXT = 0;
+    public static final int FILE_TYPE_KML = 1;
+    public static final int FILE_TYPE_GPX = 2;
 
     private final int TRACK_TYPE_STEADY   = 0;
     private final int TRACK_TYPE_WALK     = 1;
@@ -582,6 +588,37 @@ public class Track {
 
     public void setSelected(boolean selected) {
         Selected = selected;
+    }
+
+    public File getTXTFile() {
+        return getFile(FILE_TYPE_TXT);
+    }
+
+    public File getKMLFile() {
+        return getFile(FILE_TYPE_KML);
+    }
+
+    public File getGPXFile() {
+        return getFile(FILE_TYPE_GPX);
+    }
+
+    public File getFile(int fileType) {
+        String fileExtension = "";
+        switch (fileType) {
+            case FILE_TYPE_KML:
+                fileExtension = ".kml";
+                break;
+            case FILE_TYPE_GPX:
+                fileExtension = ".gpx";
+                break;
+            case FILE_TYPE_TXT: // FILE_TYPE_TXT considered as the default file type
+            default:
+                fileExtension = ".txt";
+                break;
+        }
+        String path = Environment.getExternalStorageDirectory() + "/GPSLogger/" + getName() + fileExtension;
+        File file = new File(path);
+        return file.exists() ? file : null;
     }
 
     // --------------------------------------------------------------------------------------------

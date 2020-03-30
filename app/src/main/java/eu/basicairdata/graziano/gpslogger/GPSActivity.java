@@ -419,6 +419,22 @@ public class GPSActivity extends AppCompatActivity {
                     }
                 });
                 break;
+            case EventBusMSG.TOAST_TRACK_SEND_FTP_SUCCESS:
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, "Tracks sent via FTP to " + GPSApp.getPrefFTPHost(), Toast.LENGTH_LONG).show();
+                    }
+                });
+                break;
+            case EventBusMSG.TOAST_TRACK_SEND_FTP_FAILED:
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, "Failed to send the tracks via FTP to " + GPSApp.getPrefFTPHost(), Toast.LENGTH_LONG).show();
+                    }
+                });
+                break;
             case EventBusMSG.TOAST_STORAGE_PERMISSION_REQUIRED:
                 runOnUiThread(new Runnable() {
                     @Override

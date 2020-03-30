@@ -31,6 +31,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -66,6 +67,10 @@ import java.util.StringTokenizer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import eu.basicairdata.graziano.gpslogger.ftp.FTPTransferTask;
+import eu.basicairdata.graziano.gpslogger.ftp.FTPTransferThread;
+import it.sauronsoftware.ftp4j.FTPClient;
+
 public class GPSApplication extends Application implements GpsStatus.Listener, LocationListener {
 
     //private static final float M_TO_FT = 3.280839895f;
@@ -96,6 +101,7 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
     public static final int JOB_TYPE_VIEW       = 2;                // Bulk View
     public static final int JOB_TYPE_SHARE      = 3;                // Bulk Share
     public static final int JOB_TYPE_DELETE     = 4;                // Bulk Delete
+    public static final int JOB_TYPE_SEND_FTP  = 5;                // Bulk Send, via FTP
 
     public static final String FLAG_RECORDING   = "flagRecording";  // The persistent Flag is set when the app is recording, in order to detect Background Crashes
 
@@ -181,6 +187,8 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
     public int JobType = JOB_TYPE_NONE;                     // The type of job that is pending
     private boolean DeleteAlsoExportedFiles = false;        // When true, the deletion of some tracks will delete also the exported files of the tracks
 
+    private FTPClient ftp = null;
+
     public int GPSActivityColorTheme;
 
     private int _Stabilizer = StabilizingSamples;
@@ -218,13 +226,59 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
     };
 
     private final int MAX_ACTIVE_EXPORTER_THREADS = 3;      // The maximum number of Exporter threads to run simultaneously
+    private final int MAX_ACTIVE_FTP_TRANSFER_THREADS = 1;
 
     private List<ExportingTask> ExportingTaskList = new ArrayList<>();
+    private List<FTPTransferTask> FTPTransferTaskList = new ArrayList<>();
 
 
     // The handler that checks the progress of an exportation:
     private final int ExportingStatusCheckInterval = 16;          // The app updates the progress of exportation every 16 milliseconds
     final Handler ExportingStatusCheckHandler = new Handler();
+
+    // The handler that checks the progress of a FTP transfer:
+    private final int FTPTransferStatusCheckInterval = 16;
+    final Handler FTPTransferStatusCheckHandler = new Handler();
+
+    Runnable FTPTransferStatusChecker = new Runnable() {
+        @Override
+        public void run() {
+            int numTask = FTPTransferTaskList.size();
+            int numPendingTask = 0;
+            int numStartedTask = 0;
+            int numSuccessTask = 0;
+            int numFailedTask = 0;
+
+            for (FTPTransferTask task : FTPTransferTaskList) {
+                if (task.getStatus() == FTPTransferTask.STATUS_PENDING) numPendingTask++;
+                if (task.getStatus() == FTPTransferTask.STATUS_STARTED) numStartedTask++;
+                if (task.getStatus() == FTPTransferTask.STATUS_SUCCESS) numSuccessTask++;
+                if (task.getStatus() == FTPTransferTask.STATUS_FAILED) numFailedTask++;
+            }
+
+            if (numFailedTask == numTask) {
+                EventBus.getDefault().post(EventBusMSG.TOAST_TRACK_SEND_FTP_FAILED);
+                JobsPending = 0;
+                return;
+            }
+
+            if (numSuccessTask == numTask) {
+                EventBus.getDefault().post(EventBusMSG.TOAST_TRACK_SEND_FTP_SUCCESS);
+                JobsPending = 0;
+                return;
+            }
+
+            FTPTransferStatusCheckHandler.postDelayed(FTPTransferStatusChecker, FTPTransferStatusCheckInterval);
+        }
+    };
+
+    void startFTPTransferStatusChecker() {
+        FTPTransferStatusChecker.run();
+    }
+
+    void stopFTPTransferStatusChecker() {
+        FTPTransferStatusCheckHandler.removeCallbacks(FTPTransferStatusChecker);
+    }
 
     Runnable ExportingStatusChecker = new Runnable() {
         @Override
@@ -311,7 +365,6 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
     void stopExportingStatusChecker() {
         ExportingStatusCheckHandler.removeCallbacks(ExportingStatusChecker);
     }
-
 
     // ------------------------------------------------------------------------------------ Service
     Intent GPSServiceIntent;
@@ -487,6 +540,38 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
     public boolean getPrefFTPTransferWhenCompleted() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         return preferences.getBoolean("prefFTPTransferWhenCompleted", false);
+    }
+
+    public String getPrefFTPHost() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return preferences.getString("prefFTPHost", "");
+    }
+
+    public int getPrefFTPPort() {
+        Resources resources = getResources();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return Integer.parseInt(preferences.getString(resources.getString(R.string.key_prefs_ftp_port), "21"));
+    }
+
+    public String getPrefFTPUser() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return preferences.getString("prefFTPUser", "");
+    }
+
+    public String getPrefFTPPassword() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return preferences.getString("prefFTPPassword", "");
+    }
+
+    public String getPrefFTPPath() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return preferences.getString("prefFTPPath", "");
+    }
+
+    public int getPrefFTPEncryption() {
+        Resources resources = getResources();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return Integer.parseInt(preferences.getString(resources.getString(R.string.key_prefs_ftp_encryption), "0"));
     }
 
     public boolean getPrefExportWhenCompleted() {
@@ -922,21 +1007,61 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
 
 
     public void LoadJob (int jobType) {
-        ExportingTaskList.clear();
-        synchronized(_ArrayListTracks) {
-            for (Track T : _ArrayListTracks) {
-                if (T.isSelected()) {
-                    ExportingTask ET = new ExportingTask();
-                    ET.setId(T.getId());
-                    ET.setName(T.getName());
-                    ET.setNumberOfPoints_Total(T.getNumberOfLocations() + T.getNumberOfPlacemarks());
-                    ET.setNumberOfPoints_Processed(0);
-                    ExportingTaskList.add(ET);
+        if (jobType <= 4) {
+            ExportingTaskList.clear();
+
+            synchronized(_ArrayListTracks) {
+                for (Track T : _ArrayListTracks) {
+                    if (T.isSelected()) {
+                        ExportingTask ET = new ExportingTask();
+                        ET.setId(T.getId());
+                        ET.setName(T.getName());
+                        ET.setNumberOfPoints_Total(T.getNumberOfLocations() + T.getNumberOfPlacemarks());
+                        ET.setNumberOfPoints_Processed(0);
+                        ExportingTaskList.add(ET);
+                    }
                 }
             }
+
+            JobsPending = ExportingTaskList.size();
+            JobType = jobType;
+        } else if (jobType == JOB_TYPE_SEND_FTP) {
+            FTPTransferTaskList.clear();
+
+            synchronized (_ArrayListTracks) {
+                for (Track track : _ArrayListTracks) {
+                    if (track.isSelected()) {
+                        File txtFile = track.getTXTFile();
+                        File kmlFile = track.getKMLFile();
+                        File gpxFile = track.getGPXFile();
+
+                        if (txtFile != null) {
+                            FTPTransferTask task = new FTPTransferTask();
+                            task.setFile(txtFile);
+                            FTPTransferTaskList.add(task);
+                            Log.w("myApp", "LoadJob: New FTPTransferTask for " + txtFile.getPath());
+                        }
+
+                        if (kmlFile != null) {
+                            FTPTransferTask task = new FTPTransferTask();
+                            task.setFile(kmlFile);
+                            FTPTransferTaskList.add(task);
+                            Log.w("myApp", "LoadJob: New FTPTransferTask for " + kmlFile.getPath());
+                        }
+
+                        if (gpxFile != null) {
+                            FTPTransferTask task = new FTPTransferTask();
+                            task.setFile(gpxFile);
+                            FTPTransferTaskList.add(task);
+                            Log.w("myApp", "LoadJob: New FTPTransferTask for " + gpxFile.getPath());
+                        }
+                    }
+                }
+            }
+
+            JobsPending = FTPTransferTaskList.size();
+            JobType = jobType;
         }
-        JobsPending = ExportingTaskList.size();
-        JobType = jobType;
     }
 
 
@@ -963,34 +1088,41 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
         }
     }
 
+    public void ExecuteFTPTransferTask(List<FTPTransferTask> tasks) {
+        if (tasks == null) { throw new IllegalArgumentException("Tasks should not be null"); }
+
+        FTPTransferThread newThread = new FTPTransferThread(tasks);
+        newThread.start();
+    }
 
     public void ExecuteJob () {
-        if (!ExportingTaskList.isEmpty()) {
-            switch (JobType) {
-                case JOB_TYPE_NONE:
-                    break;
-                case JOB_TYPE_DELETE:
-                    String S = "TASK_DELETE_TRACKS";
-                    for (ExportingTask ET : ExportingTaskList) {
-                        S = S + " " + ET.getId();
-                    }
-                    AsyncTODO ast = new AsyncTODO();
-                    ast.TaskType = S;
-                    ast.location = null;
-                    AsyncTODOQueue.add(ast);
-                    break;
-                case JOB_TYPE_EXPORT:
-                case JOB_TYPE_VIEW:
-                case JOB_TYPE_SHARE:
-                    startExportingStatusChecker();
-                    break;
-                default:
-                    break;
-            }
-        } else {
-            Log.w("myApp", "[#] GPSApplication.java - Empty Job, nothing processed");
-            JobProgress = 0;
-            JobsPending = 0;
+        switch (JobType) {
+            case JOB_TYPE_NONE:
+                break;
+            case JOB_TYPE_DELETE:
+                String S = "TASK_DELETE_TRACKS";
+                for (ExportingTask ET : ExportingTaskList) {
+                    S = S + " " + ET.getId();
+                }
+                AsyncTODO ast = new AsyncTODO();
+                ast.TaskType = S;
+                ast.location = null;
+                AsyncTODOQueue.add(ast);
+                break;
+            case JOB_TYPE_EXPORT:
+            case JOB_TYPE_VIEW:
+            case JOB_TYPE_SHARE:
+                startExportingStatusChecker();
+                break;
+            case JOB_TYPE_SEND_FTP:
+                ExecuteFTPTransferTask(FTPTransferTaskList);
+                startFTPTransferStatusChecker();
+                break;
+            default:
+                Log.w("myApp", "[#] GPSApplication.java - Empty Job, nothing processed");
+                JobProgress = 0;
+                JobsPending = 0;
+                break;
         }
     }
 

@@ -185,31 +185,47 @@
         android:title="@string/pref_category_FTP">
 
         <android.support.v7.preference.SwitchPreferenceCompat
-            android:key="prefFTPTransferWhenCompleted"
+            android:key="@string/key_prefs_ftp_transfer_when_completed"
             android:title="@string/pref_FTP_transfer_when_completed"
             android:summary="@string/pref_FTP_transfer_when_completed_summary"
             android:defaultValue="false" />
 
         <android.support.v7.preference.EditTextPreference
-            android:key="prefFTPHost"
+            android:key="@string/key_prefs_ftp_host"
             android:title="@string/pref_FTP_host"
             android:summary="@string/pref_FTP_host_summary" />
 
         <android.support.v7.preference.EditTextPreference
-            android:key="prefFTPUser"
+            android:key="@string/key_prefs_ftp_port"
+            android:title="@string/pref_FTP_port"
+            android:inputType="numberDecimal"
+            android:digits="1234567890"
+            android:summary="21"
+            android:defaultValue="21" />
+
+        <android.support.v7.preference.EditTextPreference
+            android:key="@string/key_prefs_ftp_user"
             android:title="@string/pref_FTP_user"
             android:summary="@string/pref_FTP_user_summary" />
 
         <android.support.v7.preference.EditTextPreference
-            android:key="prefFTPPassword"
-            android:inputType="textPassword"
+            android:key="@string/key_prefs_ftp_password"
             android:title="@string/pref_FTP_password"
+            android:inputType="textPassword"
             android:summary="@string/pref_FTP_password_summary" />
 
         <android.support.v7.preference.EditTextPreference
-            android:key="prefFTPPath"
+            android:key="@string/key_prefs_ftp_path"
             android:title="@string/pref_FTP_path"
             android:summary="@string/pref_FTP_path_summary" />
+
+        <android.support.v7.preference.ListPreference
+            android:key="@string/key_prefs_ftp_encryption"
+            android:title="@string/pref_FTP_encryption"
+            android:summary="@string/pref_FTP_encryption_summary"
+            android:entries="@array/pref_FTP_encryption"
+            android:entryValues="@array/pref_FTP_encryption_values"
+            android:defaultValue="0" />
 
     </android.support.v7.preference.PreferenceCategory>
 
