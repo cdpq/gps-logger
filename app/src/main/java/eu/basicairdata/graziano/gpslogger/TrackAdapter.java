@@ -23,6 +23,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.ColorMatrixColorFilter;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,8 +82,6 @@ class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackHolder> {
         private final CardView card;
         private final TextView textViewTrackName;
         private final TextView textViewTrackDescription;
-        private final ImageView imageViewTrackExported;
-        private final ImageView imageViewTrackTransferred;
         private final TextView textViewTrackLength;
         private final TextView textViewTrackDuration;
         private final TextView textViewTrackAltitudeGap;
@@ -93,6 +92,8 @@ class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackHolder> {
         private final ImageView imageViewThumbnail;
         private final ImageView imageViewPulse;
         private final ImageView imageViewIcon;
+        private final ImageView imageViewTrackExported;
+        private final ImageView imageViewTrackTransferred;
 
 
         @Override
@@ -117,8 +118,6 @@ class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackHolder> {
             // TextViews
             textViewTrackName           = itemView.findViewById(R.id.id_textView_card_TrackName);
             textViewTrackDescription    = itemView.findViewById(R.id.id_textView_card_TrackDesc);
-            imageViewTrackExported      = itemView.findViewById(R.id.id_imageView_card_Exported);
-            imageViewTrackTransferred   = itemView.findViewById(R.id.id_imageView_card_Transferred);
             textViewTrackLength         = itemView.findViewById(R.id.id_textView_card_length);
             textViewTrackDuration       = itemView.findViewById(R.id.id_textView_card_duration);
             textViewTrackAltitudeGap    = itemView.findViewById(R.id.id_textView_card_altitudegap);
@@ -131,6 +130,8 @@ class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackHolder> {
             imageViewThumbnail          = itemView.findViewById(R.id.id_imageView_card_minimap);
             imageViewPulse              = itemView.findViewById(R.id.id_imageView_card_pulse);
             imageViewIcon               = itemView.findViewById(R.id.id_imageView_card_tracktype);
+            imageViewTrackExported      = itemView.findViewById(R.id.id_imageView_card_Exported);
+            imageViewTrackTransferred   = itemView.findViewById(R.id.id_imageView_card_Transferred);
 
             if (isLightTheme) {
                 imageViewThumbnail.setColorFilter(colorMatrixColorFilter);
@@ -142,9 +143,6 @@ class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackHolder> {
 
         void UpdateTrackStats(Track trk) {
             //textViewTrackName.setText(trk.getName());
-
-            imageViewTrackExported.setVisibility(trk.getExported() ? View.VISIBLE : View.GONE);
-            imageViewTrackTransferred.setVisibility(trk.getTransferred() ? View.VISIBLE : View.GONE);
 
             if (trk.getNumberOfLocations() >= 1) {
                 phd = phdformatter.format(trk.getEstimatedDistance(),PhysicalDataFormatter.FORMAT_DISTANCE);
@@ -184,6 +182,11 @@ class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackHolder> {
                 imageViewPulse.setVisibility(View.INVISIBLE);
                 imageViewThumbnail.setImageBitmap(bmpCurrentTrackPaused);
             }
+
+            imageViewTrackExported.setVisibility(trk.getExported() ? View.VISIBLE : View.GONE);
+            imageViewTrackTransferred.setVisibility(trk.getTransferred() ? View.VISIBLE : View.GONE);
+
+            Log.w("myApp", "UpdateTrackStats: Track " + trk.getId() + " updated");
         }
 
 
@@ -195,9 +198,6 @@ class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackHolder> {
             imageViewPulse.setVisibility(View.INVISIBLE);
             textViewTrackName.setText(track.getName());
             textViewTrackDescription.setText(GPSApplication.getInstance().getString(R.string.track_id) + " " + track.getId());
-
-            imageViewTrackExported.setVisibility(track.getExported() ? View.VISIBLE : View.GONE);
-            imageViewTrackTransferred.setVisibility(track.getTransferred() ? View.VISIBLE : View.GONE);
 
             if (trk.getNumberOfLocations() >= 1) {
                 phd = phdformatter.format(track.getEstimatedDistance(),PhysicalDataFormatter.FORMAT_DISTANCE);
@@ -238,6 +238,11 @@ class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackHolder> {
                         .dontAnimate()
                         .into(imageViewThumbnail);
             }
+
+            imageViewTrackExported.setVisibility(track.getExported() ? View.VISIBLE : View.GONE);
+            imageViewTrackTransferred.setVisibility(track.getTransferred() ? View.VISIBLE : View.GONE);
+
+            Log.w("myApp", "BindTrack: Track " + trk.getId() + " updated in tracklist");
         }
     }
 

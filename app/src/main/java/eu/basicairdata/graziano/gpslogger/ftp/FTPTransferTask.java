@@ -2,6 +2,8 @@ package eu.basicairdata.graziano.gpslogger.ftp;
 
 import java.io.File;
 
+import eu.basicairdata.graziano.gpslogger.Track;
+
 public class FTPTransferTask {
     // Constants
     public static final int STATUS_PENDING = 0;
@@ -13,12 +15,14 @@ public class FTPTransferTask {
     private File file = null;
     private int status = 0;
     private String message = "";
+    private Track track = null;
 
     // Constructors
     public FTPTransferTask() { }
 
-    public FTPTransferTask(File file) {
+    public FTPTransferTask(File file, Track track) {
         this.setFile(file);
+        this.setTrack(track);
     }
 
     // Accessors/mutators
@@ -26,23 +30,17 @@ public class FTPTransferTask {
         this.file = file;
     }
 
-    public File getFile() {
-        return this.file;
-    }
+    public File getFile() { return this.file; }
 
-    public void setStatus(int status) {
-        this.status = status;
-    }
+    public void setTrack(Track track) {this.track = track; }
 
-    public int getStatus() {
-        return this.status;
-    }
+    public Track getTrack() { return this.track; }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
+    public void setStatus(int status) { this.status = status; }
 
-    public String getMessage() {
-        return this.message;
-    }
+    public int getStatus() { return this.status; }
+
+    public void setMessage(String message) { this.message = message; }
+
+    public String getMessage() { return this.message; }
 }

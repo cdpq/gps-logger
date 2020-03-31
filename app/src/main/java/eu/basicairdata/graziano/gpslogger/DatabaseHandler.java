@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 
-class DatabaseHandler extends SQLiteOpenHelper {
+public class DatabaseHandler extends SQLiteOpenHelper {
 
     // All Static variables
     // Database Version
@@ -330,6 +330,18 @@ class DatabaseHandler extends SQLiteOpenHelper {
         db.endTransaction();
 
         //Log.w("myApp", "[#] DatabaseHandler.java - addLocation: Location " + track.getNumberOfLocations() + " added into track " + track.getID());
+    }
+
+    /** Thread-safe version of `updateTrack`.
+     * @param track The track to update
+     */
+    public void updateTrackSync(Track track) {
+        synchronized (this) {
+            updateTrack(track);
+            notify();
+        }
+
+        Log.w("myApp", "updateTrackSync: Track updated");
     }
 
     public void updateTrack(Track track)

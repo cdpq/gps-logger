@@ -35,7 +35,7 @@ public class EventBusMSG {
     static final short UPDATE_JOB_PROGRESS              =  13;  // Update the progress of the current Job
     static final short NOTIFY_TRACKS_DELETED            =  14;  // Notify that some tracks are deleted
     static final short UPDATE_ACTIONBAR                 =  15;  // Notify that the actionbar must be updated
-    static final short REFRESH_TRACKLIST                =  16;  // Refresh the tracklist, without update it from DB
+    public static final short REFRESH_TRACKLIST                =  16;  // Refresh the tracklist, without update it from DB
     static final short TOAST_TRACK_SEND_FTP_SUCCESS     =  17;  // The FTPTransferThread has successfully sent the tracks, show toast
     static final short TOAST_TRACK_SEND_FTP_FAILED      =  18;  // The FTPTransferThread has failed to send the tracks, show toast
 

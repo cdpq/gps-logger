@@ -18,7 +18,6 @@
 
 package eu.basicairdata.graziano.gpslogger;
 
-import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 
@@ -64,7 +63,8 @@ class Exporter extends Thread {
         this.exportingTask = exportingTask;
         this.exportingTask.setNumberOfPoints_Processed(0);
         this.exportingTask.setStatus(ExportingTask.STATUS_RUNNING);
-        track = GPSApplication.getInstance().GPSDataBase.getTrack(exportingTask.getId());
+//        track = GPSApplication.getInstance().GPSDataBase.getTrack(exportingTask.getId());
+        track = exportingTask.getTrack();
         AltitudeManualCorrection = GPSApplication.getInstance().getPrefAltitudeCorrection();
         EGMAltitudeCorrection = GPSApplication.getInstance().getPrefEGM96AltitudeCorrection();
         getPrefKMLAltitudeMode = GPSApplication.getInstance().getPrefKMLAltitudeMode();
@@ -628,11 +628,13 @@ class Exporter extends Thread {
                 TXTfw.close();
             }
 
-            track.setExported(true);
-            GPSApp.GPSDataBase.updateTrack(track);
+            if (!track.getExported()) {
+                track.setExported(true);
+            }
+            GPSApp.GPSDataBase.updateTrackSync(track);
             Log.w("myApp", "[#] Exporter.java - Track "+ track.getId() +" exported in " + (System.currentTimeMillis() - start_Time) + " ms (" + elements_total + " pts @ " + ((1000L * elements_total) / (System.currentTimeMillis() - start_Time)) + " pts/s)");
-            //EventBus.getDefault().post(new EventBusMSGNormal(EventBusMSG.REFRESH_TRACKLIST, track.getId()));
             exportingTask.setStatus(ExportingTask.STATUS_ENDED_SUCCESS);
+            EventBus.getDefault().post(EventBusMSG.REFRESH_TRACKLIST);
         } catch (IOException e) {
             exportingTask.setStatus(ExportingTask.STATUS_ENDED_FAILED);
             //EventBus.getDefault().post(new EventBusMSGNormal(EventBusMSG.TOAST_UNABLE_TO_WRITE_THE_FILE, track.getId()));

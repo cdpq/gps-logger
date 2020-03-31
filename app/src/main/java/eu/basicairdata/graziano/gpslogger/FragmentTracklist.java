@@ -194,7 +194,7 @@ public class FragmentTracklist extends Fragment {
                     }
                 });
             } catch (NullPointerException e) {
-                //Log.w("myApp", "[#] FragmentTracklist.java - Unable to manage UI");
+                Log.w("myApp", "[#] FragmentTracklist.java - Unable to manage UI");
             }
             return;
         }

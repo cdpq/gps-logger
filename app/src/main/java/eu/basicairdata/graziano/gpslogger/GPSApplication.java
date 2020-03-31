@@ -428,6 +428,10 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
 
 
     // ------------------------------------------------------------------------ Getters and Setters
+    public DatabaseHandler getGPSDataBase() {
+        return this.GPSDataBase;
+    }
+
     public boolean getNewTrackFlag() {
         return NewTrackFlag;
     }
@@ -1018,6 +1022,7 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
                         ET.setName(T.getName());
                         ET.setNumberOfPoints_Total(T.getNumberOfLocations() + T.getNumberOfPlacemarks());
                         ET.setNumberOfPoints_Processed(0);
+                        ET.setTrack(T);
                         ExportingTaskList.add(ET);
                     }
                 }
@@ -1036,22 +1041,19 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
                         File gpxFile = track.getGPXFile();
 
                         if (txtFile != null) {
-                            FTPTransferTask task = new FTPTransferTask();
-                            task.setFile(txtFile);
+                            FTPTransferTask task = new FTPTransferTask(txtFile, track);
                             FTPTransferTaskList.add(task);
                             Log.w("myApp", "LoadJob: New FTPTransferTask for " + txtFile.getPath());
                         }
 
                         if (kmlFile != null) {
-                            FTPTransferTask task = new FTPTransferTask();
-                            task.setFile(kmlFile);
+                            FTPTransferTask task = new FTPTransferTask(kmlFile, track);
                             FTPTransferTaskList.add(task);
                             Log.w("myApp", "LoadJob: New FTPTransferTask for " + kmlFile.getPath());
                         }
 
                         if (gpxFile != null) {
-                            FTPTransferTask task = new FTPTransferTask();
-                            task.setFile(gpxFile);
+                            FTPTransferTask task = new FTPTransferTask(gpxFile, track);
                             FTPTransferTaskList.add(task);
                             Log.w("myApp", "LoadJob: New FTPTransferTask for " + gpxFile.getPath());
                         }
