@@ -2,7 +2,6 @@ package eu.basicairdata.graziano.gpslogger.ftp;
 
 import android.util.Log;
 
-import org.apache.commons.net.ftp.FTPSClient;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
@@ -15,14 +14,14 @@ import it.sauronsoftware.ftp4j.FTPClient;
 
 public class FTPTransferThread extends Thread {
     private List<FTPTransferTask> tasks = null;
-    private NetFTPHandler ftpHandler = null;
-    private FTPSClient ftpClient = null;
+    private FTPHandler ftpHandler = null;
+    private FTPClient ftpClient = null;
     private GPSApplication app = null;
 
     public FTPTransferThread(List<FTPTransferTask> tasks) {
         this.tasks = tasks;
-        this.ftpHandler = NetFTPHandler.getInstance();
-        this.ftpClient = ftpHandler.getFtpsClient();
+        this.ftpHandler = FTPHandler.getInstance();
+        this.ftpClient = ftpHandler.getClient();
         this.app = GPSApplication.getInstance();
     }
 
@@ -42,15 +41,8 @@ public class FTPTransferThread extends Thread {
 
         synchronized (ftpClient) {
             try {
-                NetFTPHandler.ClientConnect(true);
-                NetFTPHandler.ClientLogin();
-//                if (!ftpClient.isConnected()) {
-//                    ftpClient.connect(ftpHandler.getHost(), ftpHandler.getPort());
-//                }
-//
-//                if (!ftpClient.isAuthenticated()) {
-//                    ftpClient.login(ftpHandler.getUser(), ftpHandler.getPassword());
-//                }
+                FTPHandler.ClientConnect(true);
+                FTPHandler.ClientLogin();
 
                 for (FTPTransferTask task : tasks) {
                     task.setStatus(FTPTransferTask.STATUS_STARTED);
@@ -68,22 +60,15 @@ public class FTPTransferThread extends Thread {
                     }
 
                     try {
-//                        if (ftpClient.currentDirectory() != ftpHandler.getPath()) {
-//                            ftpClient.changeDirectory(ftpHandler.getPath());
-//                        }
+                        if (ftpClient.currentDirectory() != ftpHandler.getPath()) {
+                            ftpClient.changeDirectory(ftpHandler.getPath());
+                        }
 
                         // Send file to server
-                        Log.w("myApp", "FTPTransferThread.java - run - Sending file " + task.getFile().getName() + " to " + ftpHandler.getHost());
+                        Log.w("myApp", "FTPTransferThread.java - run - Sending file " + task.getFile().getName() + " to " + ftpClient.getHost());
+                        FTPHandler.ClientUpload(task.getFile());
 
-                        if (!NetFTPHandler.ClientUpload(task.getFile())) {
-                            Log.w("myApp", "FTPTransferThread.java - run - Failed to send file " + task.getFile().getName() + " to " + ftpHandler.getHost());
-                            task.setStatus(FTPTransferTask.STATUS_FAILED);
-                            task.setMessage("Couldn't upload file");
-                            continue;
-                        }
-//                        ftpClient.upload(task.getFile());
-
-                        Log.w("myApp", "FTPTransferThread.java - run - File " + task.getFile().getName() + " sent to " + ftpHandler.getHost());
+                        Log.w("myApp", "FTPTransferThread.java - run - File " + task.getFile().getName() + " sent to " + ftpClient.getHost());
                         task.setStatus(FTPTransferTask.STATUS_SUCCESS);
                         task.setMessage("File uploaded");
 
@@ -95,17 +80,14 @@ public class FTPTransferThread extends Thread {
                         database.updateTrackSync(track);
                         EventBus.getDefault().post(EventBusMSG.REFRESH_TRACKLIST);
                     } catch (Exception e) {
-                        Log.w("myApp", "FTPTransferThread.java - run - Failed to send file " + task.getFile().getName() + " to " + ftpHandler.getHost());
+                        Log.w("myApp", "FTPTransferThread.java - run - Failed to send file " + task.getFile().getName() + " to " + ftpClient.getHost());
                         e.printStackTrace();
                         task.setStatus(FTPTransferTask.STATUS_FAILED);
                         task.setMessage("Operation ended with exception " + e.getClass().getName());
                     }
                 }
 
-//                if (ftpClient.isConnected()) {
-//                    ftpClient.disconnect(true);
-//                }
-                NetFTPHandler.ClientDisconnect(true);
+                FTPHandler.ClientDisconnect(true);
             } catch (Exception e) {
                 Log.w("myApp", "FTPTransferThread.java - run - Failed to communicate with the client.");
                 e.printStackTrace();
@@ -118,10 +100,7 @@ public class FTPTransferThread extends Thread {
                 }
 
                 try {
-                    NetFTPHandler.ClientDisconnect(false);
-//                    if (ftpClient.isConnected()) {
-//                        ftpClient.disconnect(false);
-//                    }
+                    FTPHandler.ClientDisconnect(false);
                 } catch (Exception ex) {
                     e.printStackTrace();
                 }
