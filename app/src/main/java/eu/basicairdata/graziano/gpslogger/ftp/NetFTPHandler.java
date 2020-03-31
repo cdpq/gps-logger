@@ -4,20 +4,22 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.preference.PreferenceManager;
 
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPSClient;
+
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import eu.basicairdata.graziano.gpslogger.GPSApplication;
 import eu.basicairdata.graziano.gpslogger.R;
-import it.sauronsoftware.ftp4j.FTPAbortedException;
-import it.sauronsoftware.ftp4j.FTPClient;
-import it.sauronsoftware.ftp4j.FTPDataTransferException;
-import it.sauronsoftware.ftp4j.FTPException;
-import it.sauronsoftware.ftp4j.FTPIllegalReplyException;
 
-public class FTPHandler {
-    private static final FTPHandler instance = new FTPHandler();
-    private final FTPClient client = new FTPClient();
+public class NetFTPHandler {
+    private static final NetFTPHandler instance = new NetFTPHandler();
+    private FTPClient ftpClient = null;
+    private FTPSClient ftpsClient = null;
 
     private String host = "";
     private int port = 22;
@@ -28,7 +30,7 @@ public class FTPHandler {
 
     private SharedPreferences.OnSharedPreferenceChangeListener onSharedPreferenceChangeListener;
 
-    private FTPHandler() {
+    private NetFTPHandler() {
         GPSApplication app = GPSApplication.getInstance();
 
         this.host = app.getPrefFTPHost();
@@ -39,6 +41,8 @@ public class FTPHandler {
         this.security = app.getPrefFTPEncryption();
 
         setupOnSharedPreferenceChangeListener();
+
+        ftpsClient = new FTPSClient("SSL", false);
     }
 
     protected void setupOnSharedPreferenceChangeListener() {
@@ -67,9 +71,9 @@ public class FTPHandler {
         preferences.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
     }
 
-    public static FTPHandler getInstance() { return instance; }
+    public static NetFTPHandler getInstance() { return instance; }
 
-    public FTPClient getClient() { return this.client; }
+    public FTPSClient getFtpsClient() { return this.ftpsClient; }
 
     public String getHost() { return this.host; }
 
@@ -95,8 +99,8 @@ public class FTPHandler {
 
     protected void setSecurity(int security) { this.security = security; }
 
-    public static void ClientConnect(boolean forceReconnect) throws FTPException, IOException, FTPIllegalReplyException {
-        if (instance.client.isConnected()) {
+    public static void ClientConnect(boolean forceReconnect) throws IOException {
+        if (instance.ftpsClient.isConnected()) {
             if (forceReconnect) {
                 ClientDisconnect(true);
             } else {
@@ -104,47 +108,37 @@ public class FTPHandler {
             }
         }
 
-        if (instance.client.getSecurity() != instance.getSecurity()) {
-            instance.client.setSecurity(instance.getSecurity());
-        }
-
-        instance.client.setCharset("UTF-8");
-        instance.client.connect(instance.getHost(), instance.getPort());
+        instance.ftpsClient.connect(instance.getHost(), instance.getPort());
     }
 
-    public static void ClientLogin() throws FTPException, IOException, FTPIllegalReplyException, IllegalStateException {
-        if (!instance.client.isConnected()) {
+    public static void ClientLogin() throws IOException {
+        if (!instance.ftpsClient.isConnected()) {
             throw new IllegalStateException("Client must be connected in order to login.");
         }
 
-        if (instance.client.isAuthenticated()) {
-            throw new IllegalStateException("Client is already logged in.");
-        }
-
-        instance.client.login(instance.getUser(), instance.getPassword());
+        instance.ftpsClient.login(instance.getUser(), instance.getPassword());
     }
 
-    public static void ClientUpload(File file) throws FTPIllegalReplyException, FTPDataTransferException, FTPException, FTPAbortedException, IOException, IllegalAccessException {
-        if (!instance.client.isAuthenticated()) {
-            throw new IllegalAccessException("Client must be authenticated in order to upload.");
+    public static boolean ClientUpload(File file) throws IOException {
+        InputStream inputStream = new FileInputStream(file);
+        try {
+            return instance.ftpsClient.storeFile(file.getName(), inputStream);
+        } catch (IOException e) {
+            throw e;
+        } finally {
+            inputStream.close();
         }
-
-        instance.client.upload(file);
     }
 
-    public static void ClientLogout() throws FTPException, IOException, FTPIllegalReplyException, IllegalStateException {
-        if (!instance.client.isAuthenticated()) {
-            throw new IllegalStateException("Client must be authenticated in order to logout.");
-        }
-
-        instance.client.logout();
+    public static void ClientLogout() throws IOException {
+        instance.ftpsClient.logout();
     }
 
-    public static void ClientDisconnect(boolean sendQuitCommand) throws FTPException, IOException, FTPIllegalReplyException, IllegalStateException {
-        if (!instance.client.isConnected()) {
+    public static void ClientDisconnect(boolean sendQuitCommand) throws IOException {
+        if (!instance.ftpsClient.isConnected()) {
             throw new IllegalStateException("Client must be connection in order to disconnect.");
         }
 
-        instance.client.disconnect(sendQuitCommand);
+        instance.ftpsClient.disconnect();
     }
 }
