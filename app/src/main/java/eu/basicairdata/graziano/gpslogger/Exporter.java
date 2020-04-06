@@ -21,8 +21,6 @@ package eu.basicairdata.graziano.gpslogger;
 import android.os.Environment;
 import android.util.Log;
 
-import org.greenrobot.eventbus.EventBus;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -631,13 +629,12 @@ class Exporter extends Thread {
             if (!track.getExported()) {
                 track.setExported(true);
             }
+
             GPSApp.GPSDataBase.updateTrackSync(track);
             Log.w("myApp", "[#] Exporter.java - Track "+ track.getId() +" exported in " + (System.currentTimeMillis() - start_Time) + " ms (" + elements_total + " pts @ " + ((1000L * elements_total) / (System.currentTimeMillis() - start_Time)) + " pts/s)");
             exportingTask.setStatus(ExportingTask.STATUS_ENDED_SUCCESS);
-            EventBus.getDefault().post(EventBusMSG.REFRESH_TRACKLIST);
         } catch (IOException e) {
             exportingTask.setStatus(ExportingTask.STATUS_ENDED_FAILED);
-            //EventBus.getDefault().post(new EventBusMSGNormal(EventBusMSG.TOAST_UNABLE_TO_WRITE_THE_FILE, track.getId()));
             asyncGeopointsLoader.interrupt();
             Log.w("myApp", "[#] Exporter.java - Unable to write the file: " + e);
         } catch (InterruptedException e) {

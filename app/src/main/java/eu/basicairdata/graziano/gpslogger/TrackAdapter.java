@@ -185,8 +185,6 @@ class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackHolder> {
 
             imageViewTrackExported.setVisibility(trk.getExported() ? View.VISIBLE : View.GONE);
             imageViewTrackTransferred.setVisibility(trk.getTransferred() ? View.VISIBLE : View.GONE);
-
-            Log.w("myApp", "UpdateTrackStats: Track " + trk.getId() + " updated");
         }
 
 
@@ -241,8 +239,6 @@ class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackHolder> {
 
             imageViewTrackExported.setVisibility(track.getExported() ? View.VISIBLE : View.GONE);
             imageViewTrackTransferred.setVisibility(track.getTransferred() ? View.VISIBLE : View.GONE);
-
-            Log.w("myApp", "BindTrack: Track " + trk.getId() + " updated in tracklist");
         }
     }
 

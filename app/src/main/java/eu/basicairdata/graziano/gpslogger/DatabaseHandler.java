@@ -26,8 +26,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
 import android.util.Log;
 
-import org.greenrobot.eventbus.EventBus;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -754,9 +752,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return TrackID; // Insert this in the track ID !!!
     }
 
+    /** Thread-safe version of getTrackById().
+     * @param id The track's id
+     * @return The track
+     */
+    public Track getTrackByIdSync(long id) {
+        Track track = null;
+
+        synchronized (this) {
+            track = getTrackById(id);
+            notify();
+        }
+
+        Log.w("myApp", "getTrackByIdSync: Returned track with id " + id);
+
+        return track;
+    }
 
     // Get Track
-    public Track getTrack(long TrackID) {
+    public Track getTrackById(long TrackID) {
 
         Track track = null;
 
@@ -834,6 +848,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return track;
     }
 
+    /** Thread-safe version of getLastTrackID().
+     * @return The last track's id
+     */
+    public long getLastTrackIDSync() {
+        long id = 0;
+
+        synchronized (this) {
+            id = getLastTrackID();
+            notify();
+        }
+
+        Log.w("myApp", "getLastTrackIDSync: Returned last track id");
+
+        return id;
+    }
 
     // Get last TrackID
     public long getLastTrackID() {
@@ -858,16 +887,48 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return result;
     }
 
+    /** Thread-sage version of getLastTrack().
+     * @return The last track
+     */
+    public Track getLastTrackSync() {
+        Track track = null;
+
+        synchronized (this) {
+            track = getLastTrack();
+            notify();
+        }
+
+        Log.w("myApp", "getLastTrackSync: Returned last track");
+
+        return track;
+    }
 
     // Get last TrackID
     public Track getLastTrack() {
-        return getTrack(getLastTrackID());
+        return getTrackById(getLastTrackID());
     }
 
+    /** Thread-safe version of getTrackList().
+     * @param startNumber The start track id
+     * @param endNumber The end track id
+     * @return A list of tracks from the database where id is between startNumber and endNumber
+     */
+    public List<Track> getTrackListSync(long startNumber, long endNumber) {
+        List<Track> tracks = new ArrayList<Track>();
+
+        synchronized (this) {
+            tracks = getTrackList(startNumber, endNumber);
+            notify();
+        }
+
+        Log.w("myApp", "getTrackListSync: Returned track list");
+
+        return tracks;
+    }
 
     // Getting a list of Tracks, with number between startNumber and endNumber
     // Please note that limits both are inclusive!
-    public List<Track> getTracksList(long startNumber, long endNumber) {
+    public List<Track> getTrackList(long startNumber, long endNumber) {
 
         List<Track> trackList = new ArrayList<>();
 
@@ -949,6 +1010,81 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return trackList;
     }
 
+    public List<Track> getAllTracks() {
+        List<Track> tracks = new ArrayList<>();
+
+        String selectQuery = "SELECT  * FROM " + TABLE_TRACKS + " ORDER BY " + KEY_ID + " DESC";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    Track track = new Track();
+                    track.FromDB(cursor.getLong(0),
+                        cursor.getString(1),
+                        cursor.getString(2),
+                        cursor.getString(3),
+
+                        cursor.getDouble(4),
+                        cursor.getDouble(5),
+                        cursor.getDouble(6),
+                        cursor.getFloat(7),
+                        cursor.getFloat(8),
+                        cursor.getLong(9),
+
+                        cursor.getLong(10),
+
+                        cursor.getDouble(11),
+                        cursor.getDouble(12),
+                        cursor.getDouble(13),
+                        cursor.getFloat(14),
+                        cursor.getFloat(15),
+                        cursor.getLong(16),
+
+                        cursor.getDouble(17),
+                        cursor.getDouble(18),
+                        cursor.getFloat(19),
+
+                        cursor.getDouble(20),
+                        cursor.getFloat(21),
+
+                        cursor.getDouble(22),
+                        cursor.getDouble(23),
+                        cursor.getDouble(24),
+                        cursor.getDouble(25),
+
+                        cursor.getLong(26),
+                        cursor.getLong(27),
+
+                        cursor.getFloat(28),
+                        cursor.getFloat(29),
+                        cursor.getLong(30),
+
+                        cursor.getDouble(31),
+                        cursor.getDouble(32),
+                        cursor.getDouble(33),
+
+                        cursor.getFloat(34),
+                        cursor.getFloat(35),
+                        cursor.getFloat(36),
+
+                        cursor.getLong(37),
+                        cursor.getLong(38),
+
+                        cursor.getInt(39),
+                        cursor.getInt(40),
+                        cursor.getInt(41),
+                        cursor.getInt(42));
+
+                    tracks.add(track);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        }
+        return tracks;
+    }
 
     public void CorrectGPSWeekRollover() {
         String CorrectLocationsQuery = "UPDATE " + TABLE_LOCATIONS + " SET " + KEY_LOCATION_TIME + " = " + KEY_LOCATION_TIME + " + 619315200000 WHERE "
@@ -1011,85 +1147,4 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             db.execSQL("UPDATE " + TABLE_TRACKS + " SET " + KEY_TRACK_NAME + " = \"" + N.Name + "\" WHERE " + KEY_ID + " = " + N.id);
         }
     }
-
-
-    // Getting the list of all Tracks in the DB
-    /* NOT USED, COMMENTED OUT !!
-    public List<Track> getTracksList() {
-
-        List<Track> trackList = new ArrayList<Track>();
-
-        String selectQuery = "SELECT  * FROM " + TABLE_TRACKS
-                + " ORDER BY " + KEY_ID + " DESC";
-
-        //Log.w("myApp", "[#] DatabaseHandler.java - getTrackList() ==> " + selectQuery);
-
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-
-        if (cursor != null) {
-            // looping through all rows and adding to list
-            if (cursor.moveToFirst()) {
-                do {
-                    Track trk = new Track();
-                    trk.FromDB(cursor.getLong(0),
-                            cursor.getString(1),
-                            cursor.getString(2),
-                            cursor.getString(3),
-
-                            cursor.getDouble(4),
-                            cursor.getDouble(5),
-                            cursor.getDouble(6),
-                            cursor.getFloat(7),
-                            cursor.getFloat(8),
-                            cursor.getLong(9),
-
-                            cursor.getLong(10),
-
-                            cursor.getDouble(11),
-                            cursor.getDouble(12),
-                            cursor.getDouble(13),
-                            cursor.getFloat(14),
-                            cursor.getFloat(15),
-                            cursor.getLong(16),
-
-                            cursor.getDouble(17),
-                            cursor.getDouble(18),
-                            cursor.getFloat(19),
-
-                            cursor.getDouble(20),
-                            cursor.getFloat(21),
-
-                            cursor.getDouble(22),
-                            cursor.getDouble(23),
-                            cursor.getDouble(24),
-                            cursor.getDouble(25),
-
-                            cursor.getLong(26),
-                            cursor.getLong(27),
-
-                            cursor.getFloat(28),
-                            cursor.getFloat(29),
-                            cursor.getLong(30),
-
-                            cursor.getDouble(31),
-                            cursor.getDouble(32),
-                            cursor.getDouble(33),
-
-                            cursor.getFloat(34),
-                            cursor.getFloat(35),
-                            cursor.getFloat(36),
-
-                            cursor.getLong(37),
-                            cursor.getLong(38),
-
-                            cursor.getInt(39),
-                            cursor.getInt(40));
-                    trackList.add(trk);             // Add Track to list
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
-        }
-        return trackList;
-    } */
 }

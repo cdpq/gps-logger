@@ -315,7 +315,7 @@ public class FragmentTracklist extends Fragment {
 
             for (ExportingTask ET : selectedTracks) {
 
-                Track track = GPSApplication.getInstance().GPSDataBase.getTrack(ET.getId());
+                Track track = GPSApplication.getInstance().GPSDataBase.getTrackById(ET.getId());
                 if (track == null) return;
 
                 if (i > 0) {

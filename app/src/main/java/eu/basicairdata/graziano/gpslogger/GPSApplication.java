@@ -803,11 +803,11 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
         GPSDataBase = new DatabaseHandler(this);                                 // Initialize the Database
 
         // Prepare the current track
-        if (GPSDataBase.getLastTrackID() == 0) {
+        if (GPSDataBase.getLastTrackIDSync() == 0) {
             GPSDataBase.addTrack(new Track());                                          // Creation of the first track if the DB is empty
             isFirstRun = true;
         }
-        _currentTrack = GPSDataBase.getLastTrack();                                     // Get the last track
+        _currentTrack = GPSDataBase.getLastTrackSync();                                     // Get the last track
 
         LoadPreferences();                                                              // Load Settings
 
@@ -1319,7 +1319,18 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
 
 
     public void UpdateTrackList() {
-        long ID = GPSDataBase.getLastTrackID();
+        // Wait for any other thread to be done with the database.
+        // FIXME: I don't think this is a good idea since it locks the main thread for 100ms
+        // FIXME: and the time it takes for the other thread to finish their task may be more than 100ms
+        synchronized (GPSDataBase) {
+            try {
+                GPSDataBase.wait(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        long ID = GPSDataBase.getLastTrackIDSync();
         List<Track> _OldArrayListTracks = new ArrayList<Track>();
         _OldArrayListTracks.addAll(_ArrayListTracks);
 
@@ -1333,8 +1344,8 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
 
                 // Update the List
                 _ArrayListTracks.clear();
-                _ArrayListTracks.addAll(GPSDataBase.getTracksList(0, ID - 1));
-                if ((ID > 1) && (GPSDataBase.getTrack(ID - 1) != null)) {
+                _ArrayListTracks.addAll(GPSDataBase.getTrackListSync(0, ID - 1));
+                if ((ID > 1) && (GPSDataBase.getTrackByIdSync(ID - 1) != null)) {
                     String fname = (ID - 1) + ".png";
                     File file = new File(getApplicationContext().getFilesDir() + "/Thumbnails/", fname);
                     if (!file.exists()) Th = new Thumbnailer(ID - 1);
@@ -1355,8 +1366,8 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
                     }
                 }
             }
+
             EventBus.getDefault().post(EventBusMSG.UPDATE_TRACKLIST);
-            //Log.w("myApp", "[#] GPSApplication.java - Update Tracklist: Added " + _ArrayListTracks.size() + " tracks");
         }
     }
 
@@ -1623,7 +1634,7 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
 
         public Thumbnailer(long ID) {
 
-            Track track = GPSDataBase.getTrack(ID);
+            Track track = GPSDataBase.getTrackByIdSync(ID);
             //Log.w("myApp", "[#] GPSApplication.java - Bitmap Size = " + Size);
 
             if ((track.getNumberOfLocations() > 2) && (track.getDistance() >= 15) && (track.getValidMap() != 0)) {
