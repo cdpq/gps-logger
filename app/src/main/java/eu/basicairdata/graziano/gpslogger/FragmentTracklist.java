@@ -202,7 +202,7 @@ public class FragmentTracklist extends Fragment {
             DeleteSomeTracks();
             return;
         }
-        if (msg == EventBusMSG.UPDATE_TRACKLIST) {
+        if (msg == EventBusMSG.TRACKLIST_UPDATED) {
             Update();
             return;
         }

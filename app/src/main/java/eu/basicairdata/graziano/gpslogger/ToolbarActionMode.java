@@ -107,7 +107,7 @@ public class ToolbarActionMode implements ActionMode.Callback {
     public void onEvent(Short msg) {
         switch (msg) {
             case EventBusMSG.UPDATE_ACTIONBAR:
-            case EventBusMSG.UPDATE_TRACKLIST:
+            case EventBusMSG.TRACKLIST_UPDATED:
                 EvaluateVisibility();
         }
     }

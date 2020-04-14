@@ -21,6 +21,8 @@ package eu.basicairdata.graziano.gpslogger;
 import android.os.Environment;
 import android.util.Log;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -641,6 +643,14 @@ class Exporter extends Thread {
             exportingTask.setStatus(ExportingTask.STATUS_ENDED_FAILED);
             asyncGeopointsLoader.interrupt();
             Log.w("myApp", "[#] Exporter.java - Interrupted: " + e);
+        }
+
+        EventBus.getDefault().post(EventBusMSG.UPDATE_TRACKLIST);
+
+        // Send track via FTP when it has been exported
+        if (GPSApp.getPrefFTPTransferWhenCompleted()) {
+            GPSApp.LoadFTPTransferTask(track);
+            GPSApp.ExecuteJob();
         }
     }
 

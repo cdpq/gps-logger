@@ -29,7 +29,7 @@ public class FTPTransferThread extends Thread {
     public void run() {
         super.run();
 
-        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+        Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 
         if (this.app == null) {
             return;
@@ -78,7 +78,8 @@ public class FTPTransferThread extends Thread {
                             track.setTransferred(true);
                         }
                         database.updateTrackSync(track);
-                        EventBus.getDefault().post(EventBusMSG.REFRESH_TRACKLIST);
+
+                        EventBus.getDefault().post(EventBusMSG.UPDATE_TRACKLIST);
                     } catch (Exception e) {
                         Log.w("myApp", "FTPTransferThread.java - run - Failed to send file " + task.getFile().getName() + " to " + ftpClient.getHost());
                         e.printStackTrace();

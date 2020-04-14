@@ -873,6 +873,10 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
             MustUpdatePrefs = true;
             return;
         }
+        if (msg == EventBusMSG.UPDATE_TRACKLIST) {
+            UpdateTrackList();
+            return;
+        }
     }
 
 
@@ -1064,6 +1068,35 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
             JobsPending = FTPTransferTaskList.size();
             JobType = jobType;
         }
+    }
+
+    public void LoadFTPTransferTask(Track track) {
+        FTPTransferTaskList.clear();
+
+        File txtFile = track.getTXTFile();
+        File kmlFile = track.getKMLFile();
+        File gpxFile = track.getGPXFile();
+
+        if (txtFile != null) {
+            FTPTransferTask task = new FTPTransferTask(txtFile, track);
+            FTPTransferTaskList.add(task);
+            Log.w("myApp", "LoadJob: New FTPTransferTask for " + txtFile.getPath());
+        }
+
+        if (kmlFile != null) {
+            FTPTransferTask task = new FTPTransferTask(kmlFile, track);
+            FTPTransferTaskList.add(task);
+            Log.w("myApp", "LoadJob: New FTPTransferTask for " + kmlFile.getPath());
+        }
+
+        if (gpxFile != null) {
+            FTPTransferTask task = new FTPTransferTask(gpxFile, track);
+            FTPTransferTaskList.add(task);
+            Log.w("myApp", "LoadJob: New FTPTransferTask for " + gpxFile.getPath());
+        }
+
+        JobsPending = FTPTransferTaskList.size();
+        JobType = JOB_TYPE_SEND_FTP;
     }
 
 
@@ -1319,16 +1352,7 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
 
 
     public void UpdateTrackList() {
-        // Wait for any other thread to be done with the database.
-        // FIXME: I don't think this is a good idea since it locks the main thread for 100ms
-        // FIXME: and the time it takes for the other thread to finish their task may be more than 100ms
-        synchronized (GPSDataBase) {
-            try {
-                GPSDataBase.wait(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        Log.w("myApp", "UpdateTrackList");
 
         long ID = GPSDataBase.getLastTrackIDSync();
         List<Track> _OldArrayListTracks = new ArrayList<Track>();
@@ -1367,7 +1391,7 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
                 }
             }
 
-            EventBus.getDefault().post(EventBusMSG.UPDATE_TRACKLIST);
+            EventBus.getDefault().post(EventBusMSG.TRACKLIST_UPDATED);
         }
     }
 
@@ -1426,7 +1450,7 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
         EventBus.getDefault().post(EventBusMSG.APPLY_SETTINGS);
         EventBus.getDefault().post(EventBusMSG.UPDATE_FIX);
         EventBus.getDefault().post(EventBusMSG.UPDATE_TRACK);
-        EventBus.getDefault().post(EventBusMSG.UPDATE_TRACKLIST);
+        EventBus.getDefault().post(EventBusMSG.TRACKLIST_UPDATED);
     }
 
 

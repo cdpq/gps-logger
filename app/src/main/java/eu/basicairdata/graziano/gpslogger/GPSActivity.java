@@ -394,7 +394,7 @@ public class GPSActivity extends AppCompatActivity {
                 FragmentPlacemarkDialog placemarkDialog = new FragmentPlacemarkDialog();
                 placemarkDialog.show(fm, "");
                 break;
-            case EventBusMSG.UPDATE_TRACKLIST:
+            case EventBusMSG.TRACKLIST_UPDATED:
             case EventBusMSG.NOTIFY_TRACKS_DELETED:
                 ActivateActionModeIfNeeded();
                 break;
