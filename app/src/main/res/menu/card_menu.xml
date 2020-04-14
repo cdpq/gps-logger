@@ -33,7 +33,7 @@
         android:title="@string/card_menu_share" />
     <item
         android:id="@+id/cardmenu_export"
-        android:icon="@mipmap/ic_publish_white_24dp"
+        android:icon="@mipmap/ic_export_white_24dp"
         android:visible="true"
         android:title="@string/card_menu_export" />
     <item
