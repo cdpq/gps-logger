@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 public abstract class FTPClientAdapter {
+
     private String host = "";
     private int port = 21;
     private String user = "";
@@ -50,15 +51,15 @@ public abstract class FTPClientAdapter {
         this.password = password;
     }
 
-    public abstract void connect() throws IllegalStateException, FTPClientAdapterException;
+    public abstract void connect() throws FTPClientAdapterException, IOException;
 
-    public abstract void disconnect() throws IllegalStateException, FTPClientAdapterException;
+    public abstract void disconnect() throws FTPClientAdapterException;
 
-    public abstract void login() throws IllegalStateException, FTPClientAdapterException;
+    public abstract void login() throws FTPClientAdapterException;
 
-    public abstract void logout() throws IllegalStateException, FTPClientAdapterException;
+    public abstract void logout() throws FTPClientAdapterException;
 
-    public abstract void upload(File file) throws IllegalStateException, FTPClientAdapterException, IOException;
+    public abstract void upload(File file) throws FTPClientAdapterException, IOException;
 
-    public abstract File download(String file) throws  IllegalStateException, FTPClientAdapterException, IOException;
+    public abstract File download(String file) throws FTPClientAdapterException, IOException;
 }

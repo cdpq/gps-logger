@@ -1,9 +1,14 @@
 package eu.basicairdata.graziano.gpslogger.ftp;
 
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.Socket;
+import java.security.Provider;
+import java.security.Security;
 import java.util.Locale;
 
 import javax.net.ssl.SSLSession;
@@ -22,6 +27,9 @@ import org.apache.commons.net.ftp.FTPSClient;
  * @see "https://stackoverflow.com/questions/32398754/how-to-connect-to-ftps-server-with-data-connection-using-same-tls-session"
  */
 class SSLSessionReuseFTPSClient extends FTPSClient {
+
+    /** Constructor for SSLSessionReuseFTPSClient. */
+    public SSLSessionReuseFTPSClient() { super("TLS", true); }
 
     /** Constructor for SSLSessionReuseFTPSClient. Protocol is TLS by default.
      * @param isImplicit The security mode (Implicit/Explicit)
