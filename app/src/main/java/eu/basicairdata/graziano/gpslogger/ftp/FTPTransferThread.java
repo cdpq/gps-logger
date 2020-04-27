@@ -14,12 +14,12 @@ import eu.basicairdata.graziano.gpslogger.Track;
 public class FTPTransferThread extends Thread {
     private List<FTPTransferTask> tasks = null;
     private FTPHandler ftpHandler = null;
-    private FTPClientAdapter ftpClientAdapter = null;
     private GPSApplication app = null;
+    private FTPClientAdapter ftpClientAdapter = null;
+
+    private String directory = "/";
 
     public FTPTransferThread(List<FTPTransferTask> tasks) {
-//        System.setProperty("jdk.tls.useExtendedMasterSecret", "false");
-
         this.tasks = tasks;
         this.ftpHandler = FTPHandler.getInstance();
 
@@ -29,18 +29,11 @@ public class FTPTransferThread extends Thread {
         int port = app.getPrefFTPPort();
         String user = app.getPrefFTPUser();
         String password = app.getPrefFTPPassword();
+        int security = app.getPrefFTPEncryption();
 
-        switch (app.getPrefFTPEncryption()) {
-            case 1: // FTPS
-                ftpClientAdapter = new ApacheFTPSAdapter(host, port, user, password, "TLS", true);
-                break;
-            case 2: // FTPES
-                ftpClientAdapter = new ApacheFTPSAdapter(host, port, user, password, "TLS", false);
-                break;
-            default: // FTP
-                ftpClientAdapter = new ApacheFTPAdapter(host, port, user, password);
-                break;
-        }
+        directory = app.getPrefFTPPath();
+
+        ftpClientAdapter = new Ftp4jFTPAdapter(host, port, user, password, security);
 
         FTPHandler.setAdapter(ftpClientAdapter);
     }
@@ -63,6 +56,7 @@ public class FTPTransferThread extends Thread {
             try {
                 FTPHandler.connect();
                 FTPHandler.login();
+                FTPHandler.changeDirectory(directory);
 
                 for (FTPTransferTask task : tasks) {
                     task.setStatus(FTPTransferTask.STATUS_STARTED);
@@ -80,11 +74,6 @@ public class FTPTransferThread extends Thread {
                     }
 
                     try {
-//                        if (ftpClient.currentDirectory() != ftpHandler.getPath()) {
-//                            ftpClient.changeDirectory(ftpHandler.getPath());
-//                        }
-
-                        // Send file to server
                         Log.w("myApp", "FTPTransferThread.java - run - Sending file " + task.getFile().getName() + " to " + FTPHandler.getAdapter().getHost());
                         FTPHandler.upload(task.getFile());
 
@@ -121,7 +110,7 @@ public class FTPTransferThread extends Thread {
                 }
 
                 try {
-                    FTPHandler.disconnect();
+                    FTPHandler.forceDisconnect();
                 } catch (Exception e2) {
                     e2.printStackTrace();
                 }

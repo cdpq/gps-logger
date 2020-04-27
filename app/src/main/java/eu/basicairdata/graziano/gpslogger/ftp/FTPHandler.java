@@ -41,6 +41,14 @@ public class FTPHandler {
         instance.adapter.disconnect();
     }
 
+    public static void forceDisconnect() throws FTPClientAdapterException {
+        if (instance.adapter == null) {
+            throw new IllegalStateException("Adapter is not set");
+        }
+
+        instance.adapter.forceDisconnect();
+    }
+
     public static void login() throws FTPClientAdapterException {
         if (instance.adapter == null) {
             throw new IllegalStateException("Adapter is not set");
@@ -71,5 +79,13 @@ public class FTPHandler {
         }
 
         instance.adapter.download(file);
+    }
+
+    public static void changeDirectory(String directory) throws FTPClientAdapterException {
+        if (instance.adapter == null) {
+            throw new IllegalStateException("Adapter is not set");
+        }
+
+        instance.adapter.changeDirectory(directory);
     }
 }

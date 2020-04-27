@@ -69,6 +69,11 @@ public class ApacheFTPAdapter extends FTPClientAdapter {
     }
 
     @Override
+    public void forceDisconnect() throws FTPClientAdapterException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    @Override
     public void login() throws FTPClientAdapterException {
         if (!client.isConnected()) {
             throw new IllegalStateException("Client must be connected to host in order to login");
@@ -126,6 +131,11 @@ public class ApacheFTPAdapter extends FTPClientAdapter {
 
     @Override
     public File download(String file) throws FTPClientAdapterException, IOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    @Override
+    public void changeDirectory(String directory) throws FTPClientAdapterException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 }

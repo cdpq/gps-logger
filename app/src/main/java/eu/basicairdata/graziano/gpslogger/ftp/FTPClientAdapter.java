@@ -55,6 +55,8 @@ public abstract class FTPClientAdapter {
 
     public abstract void disconnect() throws FTPClientAdapterException;
 
+    public abstract void forceDisconnect() throws FTPClientAdapterException;
+
     public abstract void login() throws FTPClientAdapterException;
 
     public abstract void logout() throws FTPClientAdapterException;
@@ -62,4 +64,6 @@ public abstract class FTPClientAdapter {
     public abstract void upload(File file) throws FTPClientAdapterException, IOException;
 
     public abstract File download(String file) throws FTPClientAdapterException, IOException;
+
+    public abstract void changeDirectory(String directory) throws  FTPClientAdapterException;
 }

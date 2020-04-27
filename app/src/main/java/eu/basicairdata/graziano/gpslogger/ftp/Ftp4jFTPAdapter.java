@@ -10,19 +10,9 @@ import it.sauronsoftware.ftp4j.FTPClient;
 public class Ftp4jFTPAdapter extends FTPClientAdapter {
 
     private FTPClient client;
-    private boolean sendQuitCommand = true;
-    private int security = 0;
-
-    public Ftp4jFTPAdapter() {
-        super();
-
-        client = new FTPClient();
-    }
 
     public Ftp4jFTPAdapter(String host, int port, String user, String password, int security) {
         super(host, port, user, password);
-
-        this.security = security;
 
         client = new FTPClient();
         client.setSecurity(security);
@@ -48,12 +38,12 @@ public class Ftp4jFTPAdapter extends FTPClientAdapter {
 
     @Override
     public void disconnect() throws FTPClientAdapterException {
-        if (!client.isConnected() || !client.isAuthenticated()) {
-            throw new IllegalStateException("Client must be connected/authenticated in order to disconnect");
+        if (!client.isConnected()) {
+            throw new IllegalStateException("Client must be connected in order to disconnect");
         }
 
         try {
-            client.disconnect(sendQuitCommand);
+            client.disconnect(true);
         } catch (Exception e) {
             Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - disconnect: Couldn't disconnect from host");
             throw new FTPClientAdapterException("Couldn't disconnect from host", e);
@@ -62,18 +52,25 @@ public class Ftp4jFTPAdapter extends FTPClientAdapter {
         Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - disconnect: Disconnected from host");
     }
 
-    public void disconnect(boolean sendQuitCommand) throws FTPClientAdapterException {
-        this.sendQuitCommand = sendQuitCommand;
+    public void forceDisconnect() throws FTPClientAdapterException {
+        try {
+            client.disconnect(false);
+        } catch (Exception e) {
+            Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - disconnect: Couldn't force disconnect from host");
+            throw new FTPClientAdapterException("Couldn't disconnect from host", e);
+        }
 
-        disconnect();
-
-        this.sendQuitCommand = true;
+        Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - disconnect: Force disconnected from host");
     }
 
     @Override
     public void login() throws FTPClientAdapterException {
-        if (!client.isConnected() || client.isAuthenticated()) {
-            throw new IllegalStateException("Client must be connected/not authenticated to host in order to login");
+        if (!client.isConnected()) {
+            throw new IllegalStateException("Client must be connected to host in order to login");
+        }
+
+        if (client.isAuthenticated()) {
+            return;
         }
 
         try {
@@ -104,7 +101,7 @@ public class Ftp4jFTPAdapter extends FTPClientAdapter {
 
     @Override
     public void upload(File file) throws FTPClientAdapterException, IOException {
-        if (!client.isConnected()) {
+        if (!client.isConnected() || !client.isAuthenticated()) {
             throw new IllegalStateException("Client must be connected to host in order to upload a file");
         }
 
@@ -125,5 +122,20 @@ public class Ftp4jFTPAdapter extends FTPClientAdapter {
     @Override
     public File download(String file) throws FTPClientAdapterException, IOException {
         throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    public void changeDirectory(String directory) throws FTPClientAdapterException {
+        if (!client.isConnected() || !client.isAuthenticated()) {
+            throw new IllegalStateException("Client must be connected/authenticated in order to upload a file");
+        }
+
+        try {
+            client.changeDirectory(directory);
+        } catch (Exception e) {
+            Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - upload: Couldn't change directory in host");
+            throw new FTPClientAdapterException("Couldn't change directory in host", e);
+        }
+
+        Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - upload: Directory in host changed");
     }
 }
