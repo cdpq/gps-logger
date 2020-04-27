@@ -288,12 +288,49 @@ public class FragmentSettings extends PreferenceFragmentCompat {
         pShowDirections.setSummary(pShowDirections.getEntry());
         pViewTracksWith.setSummary(pViewTracksWith.getEntry());
         pFTPEncryption.setSummary(pFTPEncryption.getEntry());
-        pFileNamePrefix.setSummary(pFileNamePrefix.getText());
-        pFTPHost.setSummary(pFTPHost.getText());
-        pFTPPort.setSummary(pFTPPort.getText());
-        pFTPUser.setSummary(pFTPUser.getText());
-        pFTPPassword.setSummary(pFTPPassword.getText());
-        pFTPPath.setSummary(pFTPPath.getText());
+
+        if (pFileNamePrefix.getText().length() > 0) {
+            pFileNamePrefix.setSummary(pFileNamePrefix.getText());
+        } else {
+            pFileNamePrefix.setSummary(R.string.pref_file_name_prefix_summary);
+        }
+
+        if (pFTPHost.getText().length() > 0) {
+            pFTPHost.setSummary(pFTPHost.getText());
+        } else {
+            pFTPHost.setSummary(R.string.pref_FTP_host_summary);
+        }
+
+        if (pFTPPort.getText().length() > 0) {
+            pFTPPort.setSummary(pFTPPort.getText());
+        } else {
+            pFTPPort.setText("21"); // Make sure the value is set to default value "21"
+            pFTPPort.setSummary(R.string.pref_FTP_port_summary);
+        }
+
+        if (pFTPUser.getText().length() > 0) {
+            pFTPUser.setSummary(pFTPUser.getText());
+        } else {
+            pFTPUser.setSummary(R.string.pref_FTP_user_summary);
+        }
+
+        if (pFTPPassword.getText().length() > 0) {
+            String asterisks = "";
+
+            for (int i = 0; i < pFTPPassword.getText().length(); i++) {
+                asterisks += "*";
+            }
+
+            pFTPPassword.setSummary(asterisks);
+        } else {
+            pFTPPassword.setSummary(R.string.pref_FTP_password_summary);
+        }
+
+        if (pFTPPath.getText().length() > 0) {
+            pFTPPath.setSummary(pFTPPath.getText());
+        } else {
+            pFTPPath.setSummary(R.string.pref_FTP_path_summary);
+        }
     }
 
     public void PrefEGM96SetToFalse() {

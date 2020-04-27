@@ -40,8 +40,6 @@ public class Ftp4jFTPTestConnection extends AsyncTask<Void, Void, Boolean> {
                 Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - logout: Testing FTP connection...");
                 ftpClientAdapter.connect();
                 ftpClientAdapter.login();
-                ftpClientAdapter.changeDirectory(directory);
-                ftpClientAdapter.logout();
                 ftpClientAdapter.disconnect();
             } catch (Exception e1) {
                 Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - logout: FTP connection failed");

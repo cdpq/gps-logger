@@ -18,74 +18,74 @@ public class FTPHandler {
     }
 
     public static FTPClientAdapter getAdapter() {
-        return instance.adapter;
+        return getInstance().adapter;
     }
 
     public static void setAdapter(FTPClientAdapter adapter) {
-        instance.adapter = adapter;
+        getInstance().adapter = adapter;
     }
 
     public static void connect() throws FTPClientAdapterException, IOException {
-        if (instance.adapter == null) {
+        if (getInstance().adapter == null) {
             throw new IllegalStateException("Adapter is not set");
         }
 
-        instance.adapter.connect();
+        getInstance().adapter.connect();
     }
 
     public static void disconnect() throws FTPClientAdapterException {
-        if (instance.adapter == null) {
+        if (getInstance().adapter == null) {
             throw new IllegalStateException("Adapter is not set");
         }
 
-        instance.adapter.disconnect();
+        getInstance().adapter.disconnect();
     }
 
     public static void forceDisconnect() throws FTPClientAdapterException {
-        if (instance.adapter == null) {
+        if (getInstance().adapter == null) {
             throw new IllegalStateException("Adapter is not set");
         }
 
-        instance.adapter.forceDisconnect();
+        getInstance().adapter.forceDisconnect();
     }
 
     public static void login() throws FTPClientAdapterException {
-        if (instance.adapter == null) {
+        if (getInstance().adapter == null) {
             throw new IllegalStateException("Adapter is not set");
         }
 
-        instance.adapter.login();
+        getInstance().adapter.login();
     }
 
     public static void logout() throws FTPClientAdapterException {
-        if (instance.adapter == null) {
+        if (getInstance().adapter == null) {
             throw new IllegalStateException("Adapter is not set");
         }
 
-        instance.adapter.logout();
+        getInstance().adapter.logout();
     }
 
     public static void upload(File file) throws FTPClientAdapterException, IOException {
-        if (instance.adapter == null) {
+        if (getInstance().adapter == null) {
             throw new IllegalStateException("Adapter is not set");
         }
 
-        instance.adapter.upload(file);
+        getInstance().adapter.upload(file);
     }
 
     public static void download(String file) throws FTPClientAdapterException, IOException {
-        if (instance.adapter == null) {
+        if (getInstance().adapter == null) {
             throw new IllegalStateException("Adapter is not set");
         }
 
-        instance.adapter.download(file);
+        getInstance().adapter.download(file);
     }
 
     public static void changeDirectory(String directory) throws FTPClientAdapterException {
-        if (instance.adapter == null) {
+        if (getInstance().adapter == null) {
             throw new IllegalStateException("Adapter is not set");
         }
 
-        instance.adapter.changeDirectory(directory);
+        getInstance().adapter.changeDirectory(directory);
     }
 }

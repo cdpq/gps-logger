@@ -203,10 +203,9 @@
         <android.support.v7.preference.EditTextPreference
             android:key="@string/key_prefs_ftp_port"
             android:title="@string/pref_FTP_port"
-            android:inputType="numberDecimal"
-            android:digits="1234567890"
-            android:summary="21"
-            android:defaultValue="21" />
+            android:defaultValue="21"
+            android:summary="@string/pref_FTP_port_summary"
+            android:dialogLayout="@layout/preference_edit_number" />
 
         <android.support.v7.preference.EditTextPreference
             android:key="@string/key_prefs_ftp_user"

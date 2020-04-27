@@ -179,7 +179,7 @@
     <string name="pref_export_when_completed">Export Tracks When Completed</string>
     <string name="pref_export_when_completed_summary">Whether or not tracks should be automatically exported when completed</string>
     <string name="pref_file_name_prefix">File Name Prefix</string>
-    <string name="pref_file_name_prefix_summary">Entre file name prefix</string>
+    <string name="pref_file_name_prefix_summary">Enter file name prefix</string>
     <string name="pref_track_id_as_suffix">Use Track ID as Suffix</string>
     <string name="pref_track_id_as_suffix_summary">Add the track ID in the file name</string>
     <string name="pref_export_TXT">Export Tracks in TXT</string>
@@ -208,6 +208,7 @@
     <string name="pref_FTP_host">Host</string>
     <string name="pref_FTP_host_summary">Enter host</string>
     <string name="pref_FTP_port">Port</string>
+    <string name="pref_FTP_port_summary">21</string>
     <string name="pref_FTP_user">User</string>
     <string name="pref_FTP_user_summary">Enter user</string>
     <string name="pref_FTP_password">Password</string>
