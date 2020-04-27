@@ -39,6 +39,8 @@ public class EventBusMSG {
     public static final short REFRESH_TRACKLIST         =  17;  // Refresh the tracklist, without update it from DB
     static final short TOAST_TRACK_SEND_FTP_SUCCESS     =  18;  // The FTPTransferThread has successfully sent the tracks, show toast
     static final short TOAST_TRACK_SEND_FTP_FAILED      =  19;  // The FTPTransferThread has failed to send the tracks, show toast
+    public static final short TOAST_FTP_CONNECTION_TEST_FAILED     =   20;  // The FTP connection test has failed, show toast
+    public static final short TOAST_FTP_CONNECTION_TEST_SUCCEEDED  =   21;  // The FTP connection test has succeeded, show toast
 
     static final short TRACKLIST_DESELECT               =  24;  // The user deselect (into the tracklist) the track with a given id
     static final short TRACKLIST_SELECT                 =  25;  // The user select (into the tracklist) the track with a given id
@@ -50,4 +52,5 @@ public class EventBusMSG {
     static final short ACTION_BULK_VIEW_TRACKS          =  42;  // View the selected tracks
     static final short ACTION_BULK_SHARE_TRACKS         =  43;  // Share the selected tracks
     static final short ACTION_BULK_SEND_FTP_TRACKS      =  44;  // Send, via FTP, the selected tracks
+    static final short ACTION_FTP_TEST_CONNECTION       =  45;  // Test the FTP connection
 }

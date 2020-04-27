@@ -201,6 +201,8 @@
     <string name="pref_track_stats_movingtime">Moving time</string>
 
     <string name="pref_category_FTP">FTP</string>
+    <string name="pref_FTP_test_connection">Test FTP Connection</string>
+    <string name="pref_FTP_test_connection_summary">Click me to test the FTP connection</string>
     <string name="pref_FTP_transfer_when_completed">Transfer Tracks When Completed</string>
     <string name="pref_FTP_transfer_when_completed_summary">Whether or not tracks should be automatically transferred when completed</string>
     <string name="pref_FTP_host">Host</string>
@@ -223,6 +225,8 @@
     <string name="toast_download_completed">Download completed</string>
     <string name="toast_download_failed">Download failed. Try again later</string>
     <string name="toast_active_track_not_empty">The active track is not empty</string>
+    <string name="toast_ftp_connection_test_failed">The FTP connection is not working</string>
+    <string name="toast_ftp_connection_test_succeeded">The FTP connection is working</string>
 
     <!-- About Dialog -->
     <string name="about_version">ver.</string>

@@ -184,6 +184,11 @@
     <android.support.v7.preference.PreferenceCategory
         android:title="@string/pref_category_FTP">
 
+        <Preference
+            android:key="@string/key_prefs_ftp_test_connection"
+            android:title="@string/pref_FTP_test_connection"
+            android:summary="@string/pref_FTP_test_connection_summary" />
+
         <android.support.v7.preference.SwitchPreferenceCompat
             android:key="@string/key_prefs_ftp_transfer_when_completed"
             android:title="@string/pref_FTP_transfer_when_completed"
@@ -211,8 +216,8 @@
         <android.support.v7.preference.EditTextPreference
             android:key="@string/key_prefs_ftp_password"
             android:title="@string/pref_FTP_password"
-            android:inputType="textPassword"
-            android:summary="@string/pref_FTP_password_summary" />
+            android:summary="@string/pref_FTP_password_summary"
+            android:dialogLayout="@layout/preference_edit_password" />
 
         <android.support.v7.preference.EditTextPreference
             android:key="@string/key_prefs_ftp_path"

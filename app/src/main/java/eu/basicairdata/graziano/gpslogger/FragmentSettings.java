@@ -22,15 +22,16 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.ListPreference;
+import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.preference.SwitchPreferenceCompat;
@@ -56,6 +57,8 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
+import eu.basicairdata.graziano.gpslogger.ftp.Ftp4jFTPTestConnection;
 
 public class FragmentSettings extends PreferenceFragmentCompat {
 
@@ -191,6 +194,19 @@ public class FragmentSettings extends PreferenceFragmentCompat {
     }
 
     @Override
+    public boolean onPreferenceTreeClick(Preference preference) {
+        Log.w("gpslogger.prefs", "onPreferenceTreeClick: " + preference.getKey() + " clicked");
+
+        Resources resources = getResources();
+
+        if (preference.getKey() == resources.getString(R.string.key_prefs_ftp_test_connection)) {
+            new Ftp4jFTPTestConnection().execute();
+        }
+
+        return super.onPreferenceTreeClick(preference);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         // Remove dividers between preferences
@@ -229,6 +245,7 @@ public class FragmentSettings extends PreferenceFragmentCompat {
         ListPreference pViewTracksWith = (ListPreference) findPreference("prefViewTracksWith");
         ListPreference pColorTheme = (ListPreference) findPreference("prefColorTheme");
         ListPreference pFTPEncryption = (ListPreference) findPreference(GPSApplication.getInstance().getResources().getString(R.string.key_prefs_ftp_encryption));
+        EditTextPreference pFileNamePrefix = (EditTextPreference) findPreference("prefFileNamePrefix");
         EditTextPreference pAltitudeCorrection = (EditTextPreference) findPreference("prefAltitudeCorrectionRaw");
         EditTextPreference pFTPHost = (EditTextPreference) findPreference("prefFTPHost");
         EditTextPreference pFTPPort = (EditTextPreference) findPreference(GPSApplication.getInstance().getResources().getString(R.string.key_prefs_ftp_port));
@@ -271,13 +288,13 @@ public class FragmentSettings extends PreferenceFragmentCompat {
         pShowDirections.setSummary(pShowDirections.getEntry());
         pViewTracksWith.setSummary(pViewTracksWith.getEntry());
         pFTPEncryption.setSummary(pFTPEncryption.getEntry());
+        pFileNamePrefix.setSummary(pFileNamePrefix.getText());
         pFTPHost.setSummary(pFTPHost.getText());
         pFTPPort.setSummary(pFTPPort.getText());
         pFTPUser.setSummary(pFTPUser.getText());
         pFTPPassword.setSummary(pFTPPassword.getText());
         pFTPPath.setSummary(pFTPPath.getText());
     }
-
 
     public void PrefEGM96SetToFalse() {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getContext());

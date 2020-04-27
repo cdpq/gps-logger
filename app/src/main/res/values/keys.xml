@@ -20,6 +20,7 @@
   -->
 
 <resources>
+    <string name="key_prefs_ftp_test_connection">prefFTPTestConnection</string>
     <string name="key_prefs_ftp_transfer_when_completed">prefFTPTransferWhenCompleted</string>
     <string name="key_prefs_ftp_host">prefFTPHost</string>
     <string name="key_prefs_ftp_port">prefFTPPort</string>

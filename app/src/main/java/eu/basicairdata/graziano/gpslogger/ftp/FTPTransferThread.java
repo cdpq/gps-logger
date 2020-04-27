@@ -13,7 +13,6 @@ import eu.basicairdata.graziano.gpslogger.Track;
 
 public class FTPTransferThread extends Thread {
     private List<FTPTransferTask> tasks = null;
-    private FTPHandler ftpHandler = null;
     private GPSApplication app = null;
     private FTPClientAdapter ftpClientAdapter = null;
 
@@ -21,7 +20,6 @@ public class FTPTransferThread extends Thread {
 
     public FTPTransferThread(List<FTPTransferTask> tasks) {
         this.tasks = tasks;
-        this.ftpHandler = FTPHandler.getInstance();
 
         this.app = GPSApplication.getInstance();
 

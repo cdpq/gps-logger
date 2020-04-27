@@ -450,6 +450,23 @@ public class GPSActivity extends AppCompatActivity {
                         Toast.makeText(context, getString(R.string.export_unable_to_write_file), Toast.LENGTH_LONG).show();
                     }
                 });
+                break;
+            case EventBusMSG.TOAST_FTP_CONNECTION_TEST_FAILED:
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, getString(R.string.toast_ftp_connection_test_failed), Toast.LENGTH_LONG).show();
+                    }
+                });
+                break;
+            case EventBusMSG.TOAST_FTP_CONNECTION_TEST_SUCCEEDED:
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, getString(R.string.toast_ftp_connection_test_succeeded), Toast.LENGTH_LONG).show();
+                    }
+                });
+                break;
         }
     }
 
