@@ -11,6 +11,11 @@ import eu.basicairdata.graziano.gpslogger.EventBusMSG;
 import eu.basicairdata.graziano.gpslogger.GPSApplication;
 import eu.basicairdata.graziano.gpslogger.Track;
 
+/** Thread that transfer files, defined by tasks, via FTP using the FTPHandler.
+ *
+ * @see eu.basicairdata.graziano.gpslogger.ftp.FTPTransferTask
+ * @see eu.basicairdata.graziano.gpslogger.ftp.FTPHandler
+ */
 public class FTPTransferThread extends Thread {
 
     private List<FTPTransferTask> tasks = null;
@@ -20,6 +25,10 @@ public class FTPTransferThread extends Thread {
 
     private String directory = "/";
 
+    /** Constructor allowing tasks argument.
+     *
+     * @param tasks The tasks containing the information on the files to be transferred
+     */
     public FTPTransferThread(List<FTPTransferTask> tasks) {
         this.tasks = tasks;
 

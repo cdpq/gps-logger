@@ -2,7 +2,7 @@ package eu.basicairdata.graziano.gpslogger.ftp;
 
 /** Exception thrown by the FTPHandler.
  *
- * @see FTPHandler
+ * @see eu.basicairdata.graziano.gpslogger.ftp.FTPHandler
  */
 public class FTPHandlerException extends Exception {
 
