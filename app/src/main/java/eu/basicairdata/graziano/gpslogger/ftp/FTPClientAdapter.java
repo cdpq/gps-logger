@@ -12,6 +12,8 @@ import java.io.IOException;
  */
 public abstract class FTPClientAdapter {
 
+    private long index = 0;
+
     protected String host = "";
     protected int port = 21;
     protected String user = "";
@@ -29,6 +31,12 @@ public abstract class FTPClientAdapter {
         this.port = port;
         this.user = user;
         this.password = password;
+
+        createIndex();
+    }
+
+    public long getIndex() {
+        return index;
     }
 
     public String getHost() {
@@ -45,6 +53,14 @@ public abstract class FTPClientAdapter {
 
     public String getPassword() {
         return password;
+    }
+
+    /** Create the index for this adapter.
+     *
+     * The index is created using the current timestamp in milliseconds.
+     */
+    private void createIndex() {
+        this.index = System.currentTimeMillis();
     }
 
     /** Whether or not the FTP client is active (e.g., is still connected/authenticated to the FTP server).
@@ -114,5 +130,5 @@ public abstract class FTPClientAdapter {
      *
      * @throws FTPClientAdapterException Thrown when an exception was thrown by the underlying library
      */
-    public abstract void changeDirectory(String directory) throws  FTPClientAdapterException;
+    public abstract void changeDirectory(String directory) throws FTPClientAdapterException;
 }

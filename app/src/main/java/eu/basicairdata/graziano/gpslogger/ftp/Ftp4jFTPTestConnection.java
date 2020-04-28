@@ -15,6 +15,7 @@ import eu.basicairdata.graziano.gpslogger.GPSApplication;
 public class Ftp4jFTPTestConnection extends AsyncTask<Void, Void, Boolean> {
 
     private FTPClientAdapter ftpClientAdapter = null;
+    private long ftpClientAdapterIndex = -1;
 
     @Override
     protected void onPreExecute() {
@@ -29,23 +30,36 @@ public class Ftp4jFTPTestConnection extends AsyncTask<Void, Void, Boolean> {
         int security = app.getPrefFTPEncryption();
 
         ftpClientAdapter = new Ftp4jFTPAdapter(host, port, user, password, security);
+
+        try {
+            ftpClientAdapterIndex = FTPHandler.addAdapter(ftpClientAdapter);
+        } catch (FTPHandlerException e) {
+            Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - onPreExecute: Failed to initialize the client");
+            e.printStackTrace();
+
+            this.cancel(false);
+        }
     }
 
     @Override
     protected Boolean doInBackground(Void... voids) {
 
+        if (ftpClientAdapterIndex == -1) {
+            return false;
+        }
+
         synchronized (ftpClientAdapter) {
             try {
-                Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - logout: Testing FTP connection...");
-                ftpClientAdapter.connect();
-                ftpClientAdapter.login();
-                ftpClientAdapter.disconnect();
+                Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - doInBackground: Testing FTP connection...");
+                FTPHandler.connect(ftpClientAdapterIndex);
+                FTPHandler.login(ftpClientAdapterIndex);
+                FTPHandler.disconnect(ftpClientAdapterIndex);
             } catch (Exception e1) {
-                Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - logout: FTP connection failed");
+                Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - doInBackground: FTP connection failed");
                 e1.printStackTrace();
 
                 try {
-                    ftpClientAdapter.forceDisconnect();
+                    FTPHandler.forceDisconnect(ftpClientAdapterIndex);
                 } catch (Exception e2) {
                     e2.printStackTrace();
                 }
@@ -54,7 +68,7 @@ public class Ftp4jFTPTestConnection extends AsyncTask<Void, Void, Boolean> {
             }
         }
 
-        Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - logout: FTP connection succeeded");
+        Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - doInBackground: FTP connection succeeded");
 
         return true;
     }
@@ -63,7 +77,12 @@ public class Ftp4jFTPTestConnection extends AsyncTask<Void, Void, Boolean> {
     protected void onPostExecute(Boolean result) {
         super.onPostExecute(result);
 
-        Log.w("gpslogger.ftp", "onPostExecute: " + result);
+        try {
+            FTPHandler.removeAdapter(ftpClientAdapter);
+        } catch (FTPHandlerException e) {
+            Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - onPostExecute: Failed to terminate the client");
+            e.printStackTrace();
+        }
 
         if (result) {
             EventBus.getDefault().post(EventBusMSG.TOAST_FTP_CONNECTION_TEST_SUCCEEDED);

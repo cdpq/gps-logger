@@ -12,10 +12,11 @@ import eu.basicairdata.graziano.gpslogger.GPSApplication;
 import eu.basicairdata.graziano.gpslogger.Track;
 
 public class FTPTransferThread extends Thread {
+
     private List<FTPTransferTask> tasks = null;
     private GPSApplication app = null;
     private FTPClientAdapter ftpClientAdapter = null;
-    private int ftpClientAdapterIndex = -1;
+    private long ftpClientAdapterIndex = -1;
 
     private String directory = "/";
 
@@ -37,7 +38,7 @@ public class FTPTransferThread extends Thread {
         try {
             ftpClientAdapterIndex = FTPHandler.addAdapter(ftpClientAdapter);
         } catch (FTPHandlerException e) {
-            Log.w("myApp", "FTPTransferThread.java - run - Failed to initialize the client.");
+            Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - FTPTransferThread: Failed to initialize the client");
             e.printStackTrace();
 
             for (FTPTransferTask task : tasks) {
@@ -89,10 +90,10 @@ public class FTPTransferThread extends Thread {
                     }
 
                     try {
-                        Log.w("myApp", "FTPTransferThread.java - run - Sending file " + task.getFile().getName() + " to " + FTPHandler.getAdapter(ftpClientAdapterIndex).getHost());
+                        Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - run: Sending file " + task.getFile().getName() + " to " + FTPHandler.getAdapter(ftpClientAdapterIndex).getHost());
                         FTPHandler.upload(ftpClientAdapterIndex, task.getFile());
 
-                        Log.w("myApp", "FTPTransferThread.java - run - File " + task.getFile().getName() + " sent to " + FTPHandler.getAdapter(ftpClientAdapterIndex).getHost());
+                        Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - run: File " + task.getFile().getName() + " sent to " + FTPHandler.getAdapter(ftpClientAdapterIndex).getHost());
                         task.setStatus(FTPTransferTask.STATUS_SUCCESS);
                         task.setMessage("File uploaded");
 
@@ -105,8 +106,9 @@ public class FTPTransferThread extends Thread {
 
                         EventBus.getDefault().post(EventBusMSG.UPDATE_TRACKLIST);
                     } catch (Exception e) {
-                        Log.w("myApp", "FTPTransferThread.java - run - Failed to send file " + task.getFile().getName() + " to " + FTPHandler.getAdapter(ftpClientAdapterIndex).getHost());
+                        Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - run: Failed to send file " + task.getFile().getName() + " to " + FTPHandler.getAdapter(ftpClientAdapterIndex).getHost());
                         e.printStackTrace();
+
                         task.setStatus(FTPTransferTask.STATUS_FAILED);
                         task.setMessage("Operation ended with exception " + e.getClass().getName());
                     }
@@ -114,7 +116,7 @@ public class FTPTransferThread extends Thread {
 
                 FTPHandler.disconnect(ftpClientAdapterIndex);
             } catch (Exception e1) {
-                Log.w("myApp", "FTPTransferThread.java - run - Failed to communicate with the client.");
+                Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - run: Failed to communicate with the client");
                 e1.printStackTrace();
 
                 for (FTPTransferTask task : tasks) {
@@ -137,7 +139,7 @@ public class FTPTransferThread extends Thread {
         try {
             FTPHandler.removeAdapter(ftpClientAdapter);
         } catch (FTPHandlerException e) {
-            Log.w("myApp", "FTPTransferThread.java - run - Failed to terminate the client.");
+            Log.w("gpslogger.ftp", this.getClass().getSimpleName() + " - run: Failed to terminate the client");
             e.printStackTrace();
         }
     }

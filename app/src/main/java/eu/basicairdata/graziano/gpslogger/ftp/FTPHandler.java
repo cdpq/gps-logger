@@ -7,27 +7,31 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Handles a specified FTPClientAdapter. Acts like a facade to the FTPClientAdapter subclasses.
+/** Singleton that handles one or multiple instances of FTPClientAdapter.
  *
- * This class is a Singleton, meaning that it has only one instance and and it's public method are
- * static. The goal of this class is to make sure that the number of adapters at a given time is less
- * or equal to the specified limit (default is 1).
+ * The goal of this class is to make sure that the number of adapters at any given time is less
+ * or equal to the specified limit (default is 3). That said, it keeps tracks of how many adapters has
+ * it's underlying client active. This avoid the system to be impacted by unclosed FTP communication(s).
+ *
+ * This class's methods should always be called over any FTPClientAdapter's instances' methods,
+ * i.e., call FTPHandler.connect(adapterIndex) instead of implClientAdapter.connect().
  *
  * @see eu.basicairdata.graziano.gpslogger.ftp.FTPClientAdapter
  */
 public class FTPHandler {
-    private static FTPHandler instance = null;
-    private FTPClientAdapter adapter = null;
 
-    private int adapterLimit = 1;
+    private static FTPHandler instance = null;
+
+    private int adapterLimit = 3;
     private List<FTPClientAdapter> adapters = new ArrayList<>();
 
     /** Empty constructor. */
-    private FTPHandler()
-    {
+    private FTPHandler() { }
 
-    }
-
+    /** Get the instance of FTPHandler.
+     *
+     * @return The instance of FTPHandler
+     */
     public static FTPHandler getInstance() {
         if (instance == null) {
             instance = new FTPHandler();
@@ -36,16 +40,32 @@ public class FTPHandler {
         return instance;
     }
 
-    public static FTPClientAdapter getAdapter(int adapterIndex) {
-        if (adapterIndex >= getInstance().adapters.size() || adapterIndex < 0) {
-            throw new IllegalArgumentException("The adapter index must be between 0 and the number of adapters minus 1");
+    /** Get an adapter by index.
+     *
+     * @param adapterIndex The adapter's index
+     *
+     * @return The adapter, if found
+     *
+     * @throws FTPHandlerException Thrown if the adapter was not found
+     */
+    public static FTPClientAdapter getAdapter(long adapterIndex) throws FTPHandlerException {
+        for (FTPClientAdapter adapter : getInstance().adapters) {
+            if (adapter.getIndex() == adapterIndex) {
+                return adapter;
+            }
         }
 
-        return getInstance().adapters.get(adapterIndex);
+        throw new FTPHandlerException("The adapter index was not found amongst adapters in the list");
     }
 
+    /** Set the number of adapters limit.
+     *
+     * @param adapterLimit The new limit for the number of adapters
+     *
+     * @throws FTPHandlerException Thrown if the value is less than 0 or the current number of adapters
+     */
     public static void setAdapterLimit(int adapterLimit) throws FTPHandlerException {
-        if (adapterLimit < getInstance().adapters.size()) {
+        if (adapterLimit < 0 || adapterLimit < getInstance().adapters.size()) {
             throw new FTPHandlerException("The value is less that the current number of adapters");
         }
 
@@ -54,25 +74,26 @@ public class FTPHandler {
         Log.w("gpslogger.ftp", getInstance().getClass().getSimpleName() + " - setAdapterLimit: Adapter limit set to " + adapterLimit);
     }
 
+    /** Get the number of adapters limit.
+     *
+     * @return The number of adapters limit
+     */
     public static int getAdapterLimit() {
         return getInstance().adapterLimit;
     }
 
-    /** @deprecated */
-    @Deprecated
-    public static FTPClientAdapter getAdapter() {
-        return getInstance().adapter;
-    }
-
-    /** @deprecated */
-    @Deprecated
-    public static void setAdapter(FTPClientAdapter adapter) {
-        getInstance().adapter = adapter;
-    }
-
-    public static int addAdapter(FTPClientAdapter adapter) throws FTPHandlerException {
+    /** Add an adapter to the list of adapters.
+     *
+     * @param adapter The adapter to add to the list of adapters
+     *
+     * @return The adapter's index
+     *
+     * @throws FTPHandlerException Thrown if the adapter is already in the list of adapters or the number of
+     * adapters limit is reached
+     */
+    public static long addAdapter(FTPClientAdapter adapter) throws FTPHandlerException {
         if (getInstance().adapters.contains(adapter)) {
-            throw new FTPHandlerException("The adapter is already in the list of adapters");
+            throw new FTPHandlerException("The adapter " + adapter.getIndex() + " is already in the list of adapters");
         }
 
         if (getInstance().adapters.size() == getInstance().adapterLimit) {
@@ -81,28 +102,41 @@ public class FTPHandler {
 
         getInstance().adapters.add(adapter);
 
-        Log.w("gpslogger.ftp", getInstance().getClass().getSimpleName() + " - setAdapterLimit: Added adapter to the list");
+        Log.w("gpslogger.ftp", getInstance().getClass().getSimpleName() + " - setAdapterLimit: Added adapter " + adapter.getIndex() + " to the list");
         Log.w("gpslogger.ftp", getInstance().getClass().getSimpleName() + " - setAdapterLimit: Number of adapters is now " + getInstance().adapters.size());
 
-        return getInstance().adapters.indexOf(adapter);
+        return adapter.getIndex();
     }
 
+    /** Remove an adapter from the list of adapters.
+     *
+     * @param adapter The adapter to remove from the list of adapters
+     *
+     * @throws FTPHandlerException Thrown if the adapter is not in the list of adapters of is considered
+     * active
+     */
     public static void removeAdapter(FTPClientAdapter adapter) throws FTPHandlerException {
         if (!getInstance().adapters.contains(adapter)) {
-            throw new FTPHandlerException("The adapter is not in the list of adapters");
+            throw new FTPHandlerException("The adapter " + adapter.getIndex() + " is not in the list of adapters");
         }
 
         if (adapter.isActive()) {
-            throw new FTPHandlerException("The adapter is considered active, cannot be removed");
+            throw new FTPHandlerException("The adapter " + adapter.getIndex() + " is considered active, cannot be removed");
         }
 
         getInstance().adapters.remove(adapter);
 
-        Log.w("gpslogger.ftp", getInstance().getClass().getSimpleName() + " - setAdapterLimit: Removed adapter from the list");
+        Log.w("gpslogger.ftp", getInstance().getClass().getSimpleName() + " - setAdapterLimit: Removed adapter " + adapter.getIndex() + " from the list");
         Log.w("gpslogger.ftp", getInstance().getClass().getSimpleName() + " - setAdapterLimit: Number of adapters is now " + getInstance().adapters.size());
     }
 
-    public static void connect(int adapterIndex) throws FTPClientAdapterException, IOException {
+    /** Command the adapter that matches the given index to connect to an FTP server.
+     *
+     * @param adapterIndex The adapter's index
+     *
+     * @throws FTPClientAdapterException Thrown if an exception was thrown in the adapter's underlying client
+     */
+    public static void connect(long adapterIndex) throws FTPClientAdapterException, FTPHandlerException {
         FTPClientAdapter adapter = getAdapter(adapterIndex);
 
         if (adapter == null) {
@@ -112,17 +146,13 @@ public class FTPHandler {
         adapter.connect();
     }
 
-    /** @deprecated */
-    @Deprecated
-    public static void connect() throws FTPClientAdapterException, IOException {
-        if (getInstance().adapter == null) {
-            throw new IllegalStateException("Adapter is not set");
-        }
-
-        getInstance().adapter.connect();
-    }
-
-    public static void disconnect(int adapterIndex) throws FTPClientAdapterException {
+    /** Command the adapter that matches the given index to disconnect from an FTP server.
+     *
+     * @param adapterIndex The adapter's index
+     *
+     * @throws FTPClientAdapterException Thrown if an exception was thrown in the adapter's underlying client
+     */
+    public static void disconnect(long adapterIndex) throws FTPClientAdapterException, FTPHandlerException {
         FTPClientAdapter adapter = getAdapter(adapterIndex);
 
         if (adapter == null) {
@@ -132,17 +162,18 @@ public class FTPHandler {
         adapter.disconnect();
     }
 
-    /** @deprecated */
-    @Deprecated
-    public static void disconnect() throws FTPClientAdapterException {
-        if (getInstance().adapter == null) {
-            throw new IllegalStateException("Adapter is not set");
-        }
-
-        getInstance().adapter.disconnect();
-    }
-
-    public static void forceDisconnect(int adapterIndex) throws FTPClientAdapterException {
+    /** Command the adapter that matches the given index to force disconnect from an FTP server.
+     *
+     * Keep in mind that this method should mainly be called in a catch block, right after an exception
+     * has been thrown, or in a finally block. In that sense, this method should ensure that the
+     * connection between the server and the client is closed, meaning that an exception should be
+     * thrown only in fatal cases (e.g., the server was shutdown unexpectedly).
+     *
+     * @param adapterIndex The adapter's index
+     *
+     * @throws FTPClientAdapterException Thrown if an exception was thrown in the adapter's underlying client
+     */
+    public static void forceDisconnect(long adapterIndex) throws FTPClientAdapterException, FTPHandlerException {
         FTPClientAdapter adapter = getAdapter(adapterIndex);
 
         if (adapter == null) {
@@ -152,17 +183,13 @@ public class FTPHandler {
         adapter.forceDisconnect();
     }
 
-    /** @deprecated */
-    @Deprecated
-    public static void forceDisconnect() throws FTPClientAdapterException {
-        if (getInstance().adapter == null) {
-            throw new IllegalStateException("Adapter is not set");
-        }
-
-        getInstance().adapter.forceDisconnect();
-    }
-
-    public static void login(int adapterIndex) throws FTPClientAdapterException {
+    /** Command the adapter that matches the given index to login to an FTP server.
+     *
+     * @param adapterIndex The adapter's index
+     *
+     * @throws FTPClientAdapterException Thrown if an exception was thrown in the adapter's underlying client
+     */
+    public static void login(long adapterIndex) throws FTPClientAdapterException, FTPHandlerException {
         FTPClientAdapter adapter = getAdapter(adapterIndex);
 
         if (adapter == null) {
@@ -172,17 +199,13 @@ public class FTPHandler {
         adapter.login();
     }
 
-    /** @deprecated */
-    @Deprecated
-    public static void login() throws FTPClientAdapterException {
-        if (getInstance().adapter == null) {
-            throw new IllegalStateException("Adapter is not set");
-        }
-
-        getInstance().adapter.login();
-    }
-
-    public static void logout(int adapterIndex) throws FTPClientAdapterException {
+    /** Command the adapter that matches the given index to logout from an FTP server.
+     *
+     * @param adapterIndex The adapter's index
+     *
+     * @throws FTPClientAdapterException Thrown if an exception was thrown in the adapter's underlying client
+     */
+    public static void logout(long adapterIndex) throws FTPClientAdapterException, FTPHandlerException {
         FTPClientAdapter adapter = getAdapter(adapterIndex);
 
         if (adapter == null) {
@@ -192,17 +215,15 @@ public class FTPHandler {
         adapter.logout();
     }
 
-    /** @deprecated */
-    @Deprecated
-    public static void logout() throws FTPClientAdapterException {
-        if (getInstance().adapter == null) {
-            throw new IllegalStateException("Adapter is not set");
-        }
-
-        getInstance().adapter.logout();
-    }
-
-    public static void upload(int adapterIndex, File file) throws FTPClientAdapterException, IOException {
+    /** Command the adapter that matches the given index to upload a file to an FTP server.
+     *
+     * @param adapterIndex The adapter's index
+     * @param file The file to upload
+     *
+     * @throws FTPClientAdapterException Thrown if an exception was thrown in the adapter's underlying client
+     * @throws IOException Thrown if an exception was thrown while handling the file
+     */
+    public static void upload(long adapterIndex, File file) throws FTPClientAdapterException, FTPHandlerException, IOException {
         FTPClientAdapter adapter = getAdapter(adapterIndex);
 
         if (adapter == null) {
@@ -212,37 +233,34 @@ public class FTPHandler {
         adapter.upload(file);
     }
 
-    /** @deprecated  */
-    @Deprecated
-    public static void upload(File file) throws FTPClientAdapterException, IOException {
-        if (getInstance().adapter == null) {
-            throw new IllegalStateException("Adapter is not set");
-        }
-
-        getInstance().adapter.upload(file);
-    }
-
-    public static void download(int adapterIndex, String file) throws FTPClientAdapterException, IOException {
+    /** Command the adapter that matches the given index to download a file from an FTP server.
+     *
+     * @param adapterIndex The adapter's index
+     * @param file The file's name/path to download
+     *
+     * @return The downloaded file
+     *
+     * @throws FTPClientAdapterException Thrown if an exception was thrown in the adapter's underlying client
+     * @throws IOException Thrown if an exception was thrown while handling the file
+     */
+    public static File download(long adapterIndex, String file) throws FTPClientAdapterException, FTPHandlerException, IOException {
         FTPClientAdapter adapter = getAdapter(adapterIndex);
 
         if (adapter == null) {
             throw new IllegalStateException("Adapter is not set");
         }
 
-        adapter.download(file);
+        return adapter.download(file);
     }
 
-    /** @deprecated  */
-    @Deprecated
-    public static void download(String file) throws FTPClientAdapterException, IOException {
-        if (getInstance().adapter == null) {
-            throw new IllegalStateException("Adapter is not set");
-        }
-
-        getInstance().adapter.download(file);
-    }
-
-    public static void changeDirectory(int adapterIndex, String directory) throws FTPClientAdapterException {
+    /** Command the adapter that matches the given index to change the working directory on an FTP server.
+     *
+     * @param adapterIndex The adapter's index
+     * @param directory The directory's name/path to change to
+     *
+     * @throws FTPClientAdapterException Thrown if an exception was thrown in the adapter's underlying client
+     */
+    public static void changeDirectory(long adapterIndex, String directory) throws FTPClientAdapterException, FTPHandlerException {
         FTPClientAdapter adapter = getAdapter(adapterIndex);
 
         if (adapter == null) {
@@ -250,15 +268,5 @@ public class FTPHandler {
         }
 
         adapter.changeDirectory(directory);
-    }
-
-    /** @deprecated */
-    @Deprecated
-    public static void changeDirectory(String directory) throws FTPClientAdapterException {
-        if (getInstance().adapter == null) {
-            throw new IllegalStateException("Adapter is not set");
-        }
-
-        getInstance().adapter.changeDirectory(directory);
     }
 }
