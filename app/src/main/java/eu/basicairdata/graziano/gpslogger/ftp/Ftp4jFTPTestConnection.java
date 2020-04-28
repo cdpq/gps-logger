@@ -8,26 +8,25 @@ import org.greenrobot.eventbus.EventBus;
 import eu.basicairdata.graziano.gpslogger.EventBusMSG;
 import eu.basicairdata.graziano.gpslogger.GPSApplication;
 
+/** AsyncTask for testing the FTP connection using the application preferences and Ftp4jFTPAdapter.
+ *
+ * @see eu.basicairdata.graziano.gpslogger.ftp.Ftp4jFTPAdapter
+ */
 public class Ftp4jFTPTestConnection extends AsyncTask<Void, Void, Boolean> {
 
-    private GPSApplication app = null;
     private FTPClientAdapter ftpClientAdapter = null;
-
-    private String directory = "/";
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
 
-        this.app = GPSApplication.getInstance();
+        GPSApplication app = GPSApplication.getInstance();
 
         String host = app.getPrefFTPHost();
         int port = app.getPrefFTPPort();
         String user = app.getPrefFTPUser();
         String password = app.getPrefFTPPassword();
         int security = app.getPrefFTPEncryption();
-
-        directory = app.getPrefFTPPath();
 
         ftpClientAdapter = new Ftp4jFTPAdapter(host, port, user, password, security);
     }

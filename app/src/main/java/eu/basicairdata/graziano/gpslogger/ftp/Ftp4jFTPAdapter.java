@@ -7,19 +7,49 @@ import java.io.IOException;
 
 import it.sauronsoftware.ftp4j.FTPClient;
 
+/** Subclass of FTPClientAdapter that implements FTPClient from the ftp4j library.
+ *
+ * @see eu.basicairdata.graziano.gpslogger.ftp.FTPClientAdapter
+ * @see "http://www.sauronsoftware.it/projects/ftp4j/"
+ */
 public class Ftp4jFTPAdapter extends FTPClientAdapter {
 
-    private FTPClient client;
+    protected int security = 0;
 
-    public Ftp4jFTPAdapter(String host, int port, String user, String password, int security) {
+    protected FTPClient client;
+
+    /** Constructor allowing host, port, user, password and security arguments.
+     *
+     * @param host The host name of the FTP server (111.222.333.444, example.com...)
+     * @param port The port of the FTP server
+     * @param user The user used to logon to the FTP server
+     * @param password The user's password used to logon to the FTP server
+     * @param security The encryption method (0 - standard, 1 - implicit TSL/SSL, 2 - explicit TSL/SSL)
+     */
+    Ftp4jFTPAdapter(String host, int port, String user, String password, int security) {
         super(host, port, user, password);
+
+        if (security != 0 && security != 1 && security != 2) {
+            throw new IllegalArgumentException("security argument must be 0, 1 or 2");
+        }
+
+        this.security = security;
 
         client = new FTPClient();
         client.setSecurity(security);
     }
 
+    public int getSecurity() {
+        return security;
+    }
+
     @Override
-    public void connect() throws FTPClientAdapterException, IOException {
+    public boolean isActive() {
+        return client.isConnected();
+    }
+
+    @Override
+    public void connect() throws FTPClientAdapterException {
         if (client.isConnected()) {
             throw new IllegalStateException("Client is already connected to host");
         }

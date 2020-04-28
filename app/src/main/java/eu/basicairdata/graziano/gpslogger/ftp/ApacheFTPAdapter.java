@@ -11,16 +11,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
+/** Subclass of FTPClientAdapter that implements FTPClient from the Apache Commons Net library.
+ *
+ * @see eu.basicairdata.graziano.gpslogger.ftp.FTPClientAdapter
+ * @see "http://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/ftp/FTPClient.html"
+ */
 public class ApacheFTPAdapter extends FTPClientAdapter {
 
     protected FTPClient client = null;
 
-    ApacheFTPAdapter() {
-        super();
-
-        client = new FTPClient();
-    }
-
+    /** Constructor allowing host, port, user and password arguments.
+     *
+     * @param host The host name of the FTP server (111.222.333.444, example.com...)
+     * @param port The port of the FTP server
+     * @param user The user used to logon to the FTP server
+     * @param password The user's password used to logon to the FTP server
+     */
     ApacheFTPAdapter(String host, int port, String user, String password) {
         super(host, port, user, password);
 
@@ -28,7 +34,12 @@ public class ApacheFTPAdapter extends FTPClientAdapter {
     }
 
     @Override
-    public void connect() throws FTPClientAdapterException, IOException {
+    public boolean isActive() {
+        return client.isConnected();
+    }
+
+    @Override
+    public void connect() throws FTPClientAdapterException {
         if (client.isConnected()) {
             throw new IllegalStateException("Client is already connected to host");
         }

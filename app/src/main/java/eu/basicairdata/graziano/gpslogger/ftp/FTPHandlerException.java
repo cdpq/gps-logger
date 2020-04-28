@@ -1,16 +1,16 @@
 package eu.basicairdata.graziano.gpslogger.ftp;
 
-/** Exception thrown by any FTPClientAdapter subclasses.
+/** Exception thrown by the FTPHandler.
  *
- * @see eu.basicairdata.graziano.gpslogger.ftp.FTPClientAdapter
+ * @see FTPHandler
  */
-public class FTPClientAdapterException extends Exception {
+public class FTPHandlerException extends Exception {
 
     /** Constructor allowing message argument.
      *
      * @param message The message of the exception
      */
-    FTPClientAdapterException(String message) {
+    FTPHandlerException(String message) {
         super(message);
     }
 
@@ -19,7 +19,7 @@ public class FTPClientAdapterException extends Exception {
      * @param message The message of the exception
      * @param cause The cause of the exception
      */
-    FTPClientAdapterException(String message, Throwable cause) {
+    FTPHandlerException(String message, Throwable cause) {
         super(message, cause);
     }
 }
