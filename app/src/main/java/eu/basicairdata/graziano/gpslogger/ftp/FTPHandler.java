@@ -96,22 +96,20 @@ public class FTPHandler {
             throw new FTPHandlerException("The adapter is considered active, cannot be removed");
         }
 
+        getInstance().adapters.remove(adapter);
+
         Log.w("gpslogger.ftp", getInstance().getClass().getSimpleName() + " - setAdapterLimit: Removed adapter from the list");
         Log.w("gpslogger.ftp", getInstance().getClass().getSimpleName() + " - setAdapterLimit: Number of adapters is now " + getInstance().adapters.size());
-
-        getInstance().adapters.remove(adapter);
     }
 
     public static void connect(int adapterIndex) throws FTPClientAdapterException, IOException {
-        if (getInstance().adapter == null) {
+        FTPClientAdapter adapter = getAdapter(adapterIndex);
+
+        if (adapter == null) {
             throw new IllegalStateException("Adapter is not set");
         }
 
-        if (adapterIndex >= getInstance().adapters.size() || adapterIndex < 0) {
-            throw new IllegalArgumentException("The adapter index must be between 0 and the number of adapters minus 1");
-        }
-
-        getInstance().adapter.connect();
+        adapter.connect();
     }
 
     /** @deprecated */
@@ -125,11 +123,13 @@ public class FTPHandler {
     }
 
     public static void disconnect(int adapterIndex) throws FTPClientAdapterException {
-        if (getInstance().adapter == null) {
+        FTPClientAdapter adapter = getAdapter(adapterIndex);
+
+        if (adapter == null) {
             throw new IllegalStateException("Adapter is not set");
         }
 
-        getAdapter(adapterIndex).disconnect();
+        adapter.disconnect();
     }
 
     /** @deprecated */
@@ -143,11 +143,13 @@ public class FTPHandler {
     }
 
     public static void forceDisconnect(int adapterIndex) throws FTPClientAdapterException {
-        if (getInstance().adapter == null) {
+        FTPClientAdapter adapter = getAdapter(adapterIndex);
+
+        if (adapter == null) {
             throw new IllegalStateException("Adapter is not set");
         }
 
-        getAdapter(adapterIndex).forceDisconnect();
+        adapter.forceDisconnect();
     }
 
     /** @deprecated */
@@ -161,11 +163,13 @@ public class FTPHandler {
     }
 
     public static void login(int adapterIndex) throws FTPClientAdapterException {
-        if (getInstance().adapter == null) {
+        FTPClientAdapter adapter = getAdapter(adapterIndex);
+
+        if (adapter == null) {
             throw new IllegalStateException("Adapter is not set");
         }
 
-        getAdapter(adapterIndex).login();
+        adapter.login();
     }
 
     /** @deprecated */
@@ -179,11 +183,13 @@ public class FTPHandler {
     }
 
     public static void logout(int adapterIndex) throws FTPClientAdapterException {
-        if (getInstance().adapter == null) {
+        FTPClientAdapter adapter = getAdapter(adapterIndex);
+
+        if (adapter == null) {
             throw new IllegalStateException("Adapter is not set");
         }
 
-        getAdapter(adapterIndex).logout();
+        adapter.logout();
     }
 
     /** @deprecated */
@@ -197,11 +203,13 @@ public class FTPHandler {
     }
 
     public static void upload(int adapterIndex, File file) throws FTPClientAdapterException, IOException {
-        if (getInstance().adapter == null) {
+        FTPClientAdapter adapter = getAdapter(adapterIndex);
+
+        if (adapter == null) {
             throw new IllegalStateException("Adapter is not set");
         }
 
-        getAdapter(adapterIndex).upload(file);
+        adapter.upload(file);
     }
 
     /** @deprecated  */
@@ -215,11 +223,13 @@ public class FTPHandler {
     }
 
     public static void download(int adapterIndex, String file) throws FTPClientAdapterException, IOException {
-        if (getInstance().adapter == null) {
+        FTPClientAdapter adapter = getAdapter(adapterIndex);
+
+        if (adapter == null) {
             throw new IllegalStateException("Adapter is not set");
         }
 
-        getAdapter(adapterIndex).download(file);
+        adapter.download(file);
     }
 
     /** @deprecated  */
@@ -233,11 +243,13 @@ public class FTPHandler {
     }
 
     public static void changeDirectory(int adapterIndex, String directory) throws FTPClientAdapterException {
-        if (getInstance().adapter == null) {
+        FTPClientAdapter adapter = getAdapter(adapterIndex);
+
+        if (adapter == null) {
             throw new IllegalStateException("Adapter is not set");
         }
 
-        getAdapter(adapterIndex).changeDirectory(directory);
+        adapter.changeDirectory(directory);
     }
 
     /** @deprecated */
