@@ -289,35 +289,40 @@ public class FragmentSettings extends PreferenceFragmentCompat {
         pViewTracksWith.setSummary(pViewTracksWith.getEntry());
         pFTPEncryption.setSummary(pFTPEncryption.getEntry());
 
-        if (pFileNamePrefix.getText().length() > 0) {
-            pFileNamePrefix.setSummary(pFileNamePrefix.getText());
+        String fileNamePrefix = pFileNamePrefix.getText();
+        if (fileNamePrefix != null && fileNamePrefix.length() > 0) {
+            pFileNamePrefix.setSummary(fileNamePrefix);
         } else {
             pFileNamePrefix.setSummary(R.string.pref_file_name_prefix_summary);
         }
 
-        if (pFTPHost.getText().length() > 0) {
-            pFTPHost.setSummary(pFTPHost.getText());
+        String ftpHost = pFTPHost.getText();
+        if (ftpHost != null && ftpHost.length() > 0) {
+            pFTPHost.setSummary(ftpHost);
         } else {
             pFTPHost.setSummary(R.string.pref_FTP_host_summary);
         }
 
-        if (pFTPPort.getText().length() > 0) {
-            pFTPPort.setSummary(pFTPPort.getText());
+        String ftpPort = pFTPPort.getText();
+        if (ftpPort != null && ftpPort.length() > 0) {
+            pFTPPort.setSummary(ftpPort);
         } else {
             pFTPPort.setText("21"); // Make sure the value is set to default value "21"
             pFTPPort.setSummary(R.string.pref_FTP_port_summary);
         }
 
-        if (pFTPUser.getText().length() > 0) {
-            pFTPUser.setSummary(pFTPUser.getText());
+        String ftpUser = pFTPUser.getText();
+        if (ftpUser != null && ftpUser.length() > 0) {
+            pFTPUser.setSummary(ftpUser);
         } else {
             pFTPUser.setSummary(R.string.pref_FTP_user_summary);
         }
 
-        if (pFTPPassword.getText().length() > 0) {
+        String ftpPassword = pFTPPassword.getText();
+        if (ftpPassword != null && ftpPassword.length() > 0) {
             String asterisks = "";
 
-            for (int i = 0; i < pFTPPassword.getText().length(); i++) {
+            for (int i = 0; i < ftpPassword.length(); i++) {
                 asterisks += "*";
             }
 
@@ -326,8 +331,9 @@ public class FragmentSettings extends PreferenceFragmentCompat {
             pFTPPassword.setSummary(R.string.pref_FTP_password_summary);
         }
 
-        if (pFTPPath.getText().length() > 0) {
-            pFTPPath.setSummary(pFTPPath.getText());
+        String ftpPath = pFTPPath.getText();
+        if (ftpPath != null && ftpPath.length() > 0) {
+            pFTPPath.setSummary(ftpPath);
         } else {
             pFTPPath.setSummary(R.string.pref_FTP_path_summary);
         }
