@@ -343,7 +343,6 @@ public class GPSActivity extends AppCompatActivity {
         adapter.addFragment(new FragmentGPSFix(), getString(R.string.tab_gpsfix));
         adapter.addFragment(new FragmentTrack(), getString(R.string.tab_track));
         adapter.addFragment(new FragmentTracklist(), getString(R.string.tab_tracklist));
-        adapter.addFragment(new FragmentSettings(), getString(R.string.menu_settings));
         viewPager.setAdapter(adapter);
     }
 
@@ -448,22 +447,6 @@ public class GPSActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(context, getString(R.string.export_unable_to_write_file), Toast.LENGTH_LONG).show();
-                    }
-                });
-                break;
-            case EventBusMSG.TOAST_FTP_CONNECTION_TEST_FAILED:
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(context, getString(R.string.toast_ftp_connection_test_failed), Toast.LENGTH_LONG).show();
-                    }
-                });
-                break;
-            case EventBusMSG.TOAST_FTP_CONNECTION_TEST_SUCCEEDED:
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(context, getString(R.string.toast_ftp_connection_test_succeeded), Toast.LENGTH_LONG).show();
                     }
                 });
                 break;
