@@ -422,7 +422,7 @@ public class GPSActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(context, "Tracks sent via FTP to " + GPSApp.getPrefFTPHost(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, getString(R.string.toast_ftp_send_success) + " " + GPSApp.getPrefFTPHost(), Toast.LENGTH_LONG).show();
                     }
                 });
                 break;
@@ -430,7 +430,7 @@ public class GPSActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(context, "Failed to send the tracks via FTP to " + GPSApp.getPrefFTPHost(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, getString(R.string.toast_ftp_send_failure) + " " + GPSApp.getPrefFTPHost(), Toast.LENGTH_LONG).show();
                     }
                 });
                 break;

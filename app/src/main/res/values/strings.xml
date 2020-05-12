@@ -203,8 +203,8 @@
     <string name="pref_category_FTP">FTP</string>
     <string name="pref_FTP_test_connection">Test FTP Connection</string>
     <string name="pref_FTP_test_connection_summary">Click me to test the FTP connection</string>
-    <string name="pref_FTP_transfer_when_completed">Transfer Tracks When Completed</string>
-    <string name="pref_FTP_transfer_when_completed_summary">Whether or not tracks should be automatically transferred when completed</string>
+    <string name="pref_FTP_transfer_when_completed">Send Tracks When Exported</string>
+    <string name="pref_FTP_transfer_when_completed_summary">Whether or not tracks should be automatically sent when exported</string>
     <string name="pref_FTP_host">Host</string>
     <string name="pref_FTP_host_summary">Enter host</string>
     <string name="pref_FTP_port">Port</string>
@@ -213,10 +213,10 @@
     <string name="pref_FTP_user_summary">Enter user</string>
     <string name="pref_FTP_password">Password</string>
     <string name="pref_FTP_password_summary">Enter password</string>
-    <string name="pref_FTP_path">Path</string>
-    <string name="pref_FTP_path_summary">The folder where the data will be transferred</string>
-    <string name="pref_FTP_encryption">Encryption</string>
-    <string name="pref_FTP_encryption_summary">The FTP encryption</string>
+    <string name="pref_FTP_path">Directory</string>
+    <string name="pref_FTP_path_summary">Enter the directory in which the files will be sent</string>
+    <string name="pref_FTP_encryption">Security</string>
+    <string name="pref_FTP_encryption_summary">The FTP security type</string>
     <string name="pref_FTP_encryption_ftp">Standard FTP security level</string>
     <string name="pref_FTP_encryption_ftps">FTP over implicit TSL/SSL security level</string>
     <string name="pref_FTP_encryption_ftpes">FTP over explicit TSL/SSL security level</string>
@@ -228,6 +228,8 @@
     <string name="toast_active_track_not_empty">The active track is not empty</string>
     <string name="toast_ftp_connection_test_failed">The FTP connection is not working</string>
     <string name="toast_ftp_connection_test_succeeded">The FTP connection is working</string>
+    <string name="toast_ftp_send_success">Tracks sent via FTP to</string>
+    <string name="toast_ftp_send_failure">Failed to send the tracks via FTP to</string>
 
     <!-- About Dialog -->
     <string name="about_version">ver.</string>
