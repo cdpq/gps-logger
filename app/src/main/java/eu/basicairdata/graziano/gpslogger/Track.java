@@ -18,8 +18,14 @@
 
 package eu.basicairdata.graziano.gpslogger;
 
+import android.content.SharedPreferences;
 import android.location.Location;
+import android.os.Environment;
+import android.preference.PreferenceManager;
+import android.util.Log;
 
+import java.io.File;
+import java.text.Format;
 import java.text.SimpleDateFormat;
 
 public class Track {
@@ -30,6 +36,10 @@ public class Track {
     private static final float MOVEMENT_SPEED_THRESHOLD = 0.5f;     // The minimum speed (in m/s) to consider the user in movement
     private static final float STANDARD_ACCURACY = 10.0f;
     private static final float SECURITY_COEFF = 1.7f;
+
+    public static final int FILE_TYPE_TXT = 0;
+    public static final int FILE_TYPE_KML = 1;
+    public static final int FILE_TYPE_GPX = 2;
 
     private final int TRACK_TYPE_STEADY   = 0;
     private final int TRACK_TYPE_WALK     = 1;
@@ -99,6 +109,9 @@ public class Track {
 
     private int Type = TRACK_TYPE_ND;                               // Saved in DB
 
+    private int Exported                        = 0;            // Saved in DB
+    private int Transferred                     = 0;            // Saved in DB
+
     // True if the card view is selected
     private boolean Selected = false;
 
@@ -134,6 +147,15 @@ public class Track {
             if (Name.equals("")) {
                 SimpleDateFormat df2 = new SimpleDateFormat("yyyyMMdd-HHmmss");
                 Name = df2.format(Start_Time);
+
+                SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(GPSApplication.getInstance().getBaseContext());
+                boolean Suffix = settings.getBoolean("prefTrackIDAsSuffix", false);
+                String Prefix = settings.getString("prefFileNamePrefix", "");
+
+                Log.w("myApp", "add: Prefix = " + Prefix.length());
+
+                if (Suffix) { Name += "_" + id; }
+                if (Prefix.length() != 0) { Name = Prefix + "_" + Name; }
             }
 
             LastFix_Time = Start_Time;
@@ -284,7 +306,7 @@ public class Track {
                        long DistanceLastAltitude, double Altitude_Up, double Altitude_Down,
                        double Altitude_InProgress, float SpeedMax, float   SpeedAverage,
                        float SpeedAverageMoving, long NumberOfLocations, long NumberOfPlacemarks,
-                       int ValidMap, int Type) {
+                       int ValidMap, int Type, int Exported, int Transferred) {
         this.id = id;
         this.Name = Name;
 
@@ -337,6 +359,9 @@ public class Track {
 
         this.ValidMap = ValidMap;
         this.Type = Type;
+
+        this.Exported = Exported;
+        this.Transferred = Transferred;
 
         EGM96 egm96 = EGM96.getInstance();
         if (egm96 != null) {
@@ -533,6 +558,22 @@ public class Track {
         return NumberOfPlacemarks;
     }
 
+    public boolean getExported() {
+        return Exported > 0;
+    }
+
+    public void setExported(boolean value) {
+        this.Exported = value ? 1 : 0;
+    }
+
+    public boolean getTransferred() {
+        return Transferred > 0;
+    }
+
+    public void setTransferred(boolean value) {
+        this.Transferred = value ? 1 : 0;
+    }
+
     public int getValidMap() {
         return ValidMap;
     }
@@ -547,6 +588,37 @@ public class Track {
 
     public void setSelected(boolean selected) {
         Selected = selected;
+    }
+
+    public File getTXTFile() {
+        return getFile(FILE_TYPE_TXT);
+    }
+
+    public File getKMLFile() {
+        return getFile(FILE_TYPE_KML);
+    }
+
+    public File getGPXFile() {
+        return getFile(FILE_TYPE_GPX);
+    }
+
+    public File getFile(int fileType) {
+        String fileExtension = "";
+        switch (fileType) {
+            case FILE_TYPE_KML:
+                fileExtension = ".kml";
+                break;
+            case FILE_TYPE_GPX:
+                fileExtension = ".gpx";
+                break;
+            case FILE_TYPE_TXT: // FILE_TYPE_TXT considered as the default file type
+            default:
+                fileExtension = ".txt";
+                break;
+        }
+        String path = Environment.getExternalStorageDirectory() + "/GPSLogger/" + getName() + fileExtension;
+        File file = new File(path);
+        return file.exists() ? file : null;
     }
 
     // --------------------------------------------------------------------------------------------

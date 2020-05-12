@@ -194,7 +194,7 @@ public class FragmentTracklist extends Fragment {
                     }
                 });
             } catch (NullPointerException e) {
-                //Log.w("myApp", "[#] FragmentTracklist.java - Unable to manage UI");
+                Log.w("myApp", "[#] FragmentTracklist.java - Unable to manage UI");
             }
             return;
         }
@@ -202,7 +202,7 @@ public class FragmentTracklist extends Fragment {
             DeleteSomeTracks();
             return;
         }
-        if (msg == EventBusMSG.UPDATE_TRACKLIST) {
+        if (msg == EventBusMSG.TRACKLIST_UPDATED) {
             Update();
             return;
         }
@@ -224,6 +224,14 @@ public class FragmentTracklist extends Fragment {
         }
         if (msg == EventBusMSG.ACTION_BULK_EXPORT_TRACKS) {
             GPSApplication.getInstance().LoadJob(GPSApplication.JOB_TYPE_EXPORT);
+            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                CheckStoragePermission();   // Ask for storage permission
+            } else GPSApplication.getInstance().ExecuteJob();
+            GPSApplication.getInstance().DeselectAllTracks();
+            return;
+        }
+        if (msg == EventBusMSG.ACTION_BULK_SEND_FTP_TRACKS) {
+            GPSApplication.getInstance().LoadJob(GPSApplication.JOB_TYPE_SEND_FTP);
             if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 CheckStoragePermission();   // Ask for storage permission
             } else GPSApplication.getInstance().ExecuteJob();
@@ -307,7 +315,7 @@ public class FragmentTracklist extends Fragment {
 
             for (ExportingTask ET : selectedTracks) {
 
-                Track track = GPSApplication.getInstance().GPSDataBase.getTrack(ET.getId());
+                Track track = GPSApplication.getInstance().GPSDataBase.getTrackById(ET.getId());
                 if (track == null) return;
 
                 if (i > 0) {

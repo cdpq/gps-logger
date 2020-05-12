@@ -90,6 +90,7 @@
     <string name="card_trackinfo_placemarks">Repères</string>
     <!-- Context menu of Tracklist -->
     <string name="card_menu_export">Exporter</string>
+    <string name="card_menu_send_ftp">Envoyer via FTP</string>
     <string name="card_menu_view_selector">Ouvrir avec...</string>
     <string name="card_menu_view">Ouvrir avec %1$s</string>
     <string name="card_menu_delete">Supprimer</string>
@@ -152,6 +153,12 @@
     <string name="pref_AltitudeCorrection_summary_offset">Décalage</string>
     <string name="pref_AltitudeCorrection_summary_not_defined">Aucun décalage défini</string>
     <string name="pref_category_exporting">EXPORTATION</string>
+    <string name="pref_export_when_completed">Exporter les Tracés lorsque terminés</string>
+    <string name="pref_export_when_completed_summary">Indique que les Tracés doivent être exportés automatiquement lorsque terminés</string>
+    <string name="pref_file_name_prefix">Préfixe des Tracés</string>
+    <string name="pref_file_name_prefix_summary">Entrez le préfixe à ajouter au nom des Tracés</string>
+    <string name="pref_track_id_as_suffix">Utiliser l’ID du Tracé comme suffixe</string>
+    <string name="pref_track_id_as_suffix_summary">Ajoute l’ID de chaque Tracé à la fin de leur nom</string>
     <string name="pref_export_TXT">Exporter les Tracés en TXT</string>
     <string name="pref_export_TXT_summary">Texte brut, valeurs séparées par des virgules</string>
     <string name="pref_TXT_system_of_measurement">Unités de mesure pour le format TXT</string>
@@ -169,11 +176,38 @@
     <string name="pref_track_stats">Stats de parcours basées sur</string>
     <string name="pref_track_stats_totaltime">Temps total</string>
     <string name="pref_track_stats_movingtime">Temps en mouvement</string>
+
+    <string name="pref_category_FTP">FTP</string>
+    <string name="pref_FTP_test_connection">Tester la connexion FTP</string>
+    <string name="pref_FTP_test_connection_summary">Cliquez-moi pour tester la connexion FTP</string>
+    <string name="pref_FTP_transfer_when_completed">Envoyer les Tracés lorsqu’exportés</string>
+    <string name="pref_FTP_transfer_when_completed_summary">Indique que les Tracés doivent être envoyés automatiquement lorsqu’exportés</string>
+    <string name="pref_FTP_host">Hôte</string>
+    <string name="pref_FTP_host_summary">Entrez l’adresse de l’hôte</string>
+    <string name="pref_FTP_port">Port</string>
+    <string name="pref_FTP_port_summary">21</string>
+    <string name="pref_FTP_user">Usager</string>
+    <string name="pref_FTP_user_summary">Entrez le nom d’usager</string>
+    <string name="pref_FTP_password">Mot de passe</string>
+    <string name="pref_FTP_password_summary">Entrez le mot de passe</string>
+    <string name="pref_FTP_path">Répertoire</string>
+    <string name="pref_FTP_path_summary">Entrez le nom du répertoire dans lequel les fichiers seront envoyés</string>
+    <string name="pref_FTP_encryption">Sécurité</string>
+    <string name="pref_FTP_encryption_summary">Le type de sécurité FTP</string>
+    <string name="pref_FTP_encryption_ftp">Niveau de sécurité FTP standard</string>
+    <string name="pref_FTP_encryption_ftps">FTP avec niveau de sécurité TSL/SSL implicit</string>
+    <string name="pref_FTP_encryption_ftpes">FTP avec niveau de sécurité TSL/SSL explicit</string>
+
     <!-- Preferences toasts -->
     <string name="toast_download_error">Erreur de téléchargement</string>
     <string name="toast_download_completed">Téléchargement terminé</string>
     <string name="toast_download_failed">Échec du téléchargement. Veuillez réessayer plus tard</string>
     <string name="toast_active_track_not_empty">Le tracé actif n\'est pas vide</string>
+    <string name="toast_ftp_connection_test_failed">La connexion FTP ne fonctionne pas</string>
+    <string name="toast_ftp_connection_test_succeeded">La connexion FTP fonctionne</string>
+    <string name="toast_ftp_send_success">Tracés envoyés via FTP à</string>
+    <string name="toast_ftp_send_failure">Impossible d\'envoyer les Tracés via FTP à</string>
+
     <!-- About Dialog -->
     <string name="about_version">ver.</string>
     <string name="about_description">Copyright (C) 2016 BasicAirData\nhttp://www.basicairdata.eu\n\nBasicAirData GPS Logger enregistre vos parcours en utilisant le GPS. Vous pouvez les afficher dans votre visualiseur préféré, les partager et les exporter dans le dossier GPSLogger de votre appareil au format KML, GPX et TXT.\n\nCe programme est un logiciel libre, publié sous les termes de la GNU General Public License.\nPour plus de détails, voir : http://www.gnu.org/licenses/gpl.txt\n\nPour la mise en garde sur les fichiers EGM96 geoid, voir : http://earth-info.nga.mil/GandG/disclaim.html</string>

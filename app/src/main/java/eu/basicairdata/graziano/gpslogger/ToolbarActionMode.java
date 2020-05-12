@@ -50,6 +50,7 @@ public class ToolbarActionMode implements ActionMode.Callback {
         actionmenu.findItem(R.id.cardmenu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         actionmenu.findItem(R.id.cardmenu_view).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         actionmenu.findItem(R.id.cardmenu_export).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        actionmenu.findItem(R.id.cardmenu_send_ftp).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         actionmenu.findItem(R.id.cardmenu_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         EvaluateVisibility();
         return true;
@@ -66,6 +67,10 @@ public class ToolbarActionMode implements ActionMode.Callback {
                 case R.id.cardmenu_export:
                     setActionmodeButtonPressed(true);
                     EventBus.getDefault().post(EventBusMSG.ACTION_BULK_EXPORT_TRACKS);
+                    break;
+                case R.id.cardmenu_send_ftp:
+                    setActionmodeButtonPressed(true);
+                    EventBus.getDefault().post(EventBusMSG.ACTION_BULK_SEND_FTP_TRACKS);
                     break;
                 case R.id.cardmenu_view:
                     setActionmodeButtonPressed(true);
@@ -102,7 +107,7 @@ public class ToolbarActionMode implements ActionMode.Callback {
     public void onEvent(Short msg) {
         switch (msg) {
             case EventBusMSG.UPDATE_ACTIONBAR:
-            case EventBusMSG.UPDATE_TRACKLIST:
+            case EventBusMSG.TRACKLIST_UPDATED:
                 EvaluateVisibility();
         }
     }
@@ -112,6 +117,7 @@ public class ToolbarActionMode implements ActionMode.Callback {
             actionmenu.findItem(R.id.cardmenu_view).setVisible((gpsApplication.getNumberOfSelectedTracks() <= 1) && (gpsApplication.isContextMenuViewVisible()));
             actionmenu.findItem(R.id.cardmenu_share).setVisible(gpsApplication.isContextMenuShareVisible() && (gpsApplication.getPrefExportGPX() || gpsApplication.getPrefExportKML() || gpsApplication.getPrefExportTXT()));
             actionmenu.findItem(R.id.cardmenu_export).setVisible(gpsApplication.getPrefExportGPX() || gpsApplication.getPrefExportKML() || gpsApplication.getPrefExportTXT());
+            actionmenu.findItem(R.id.cardmenu_send_ftp).setVisible(gpsApplication.getPrefExportGPX() || gpsApplication.getPrefExportKML() || gpsApplication.getPrefExportTXT());
             actionmenu.findItem(R.id.cardmenu_delete).setVisible(!gpsApplication.getSelectedTracks().contains(gpsApplication.getCurrentTrack()));
             if (!gpsApplication.getViewInApp().equals(""))
                 actionmenu.findItem(R.id.cardmenu_view).setTitle(gpsApplication.getString(R.string.card_menu_view, gpsApplication.getViewInApp()));

@@ -33,9 +33,14 @@
         android:title="@string/card_menu_share" />
     <item
         android:id="@+id/cardmenu_export"
-        android:icon="@mipmap/ic_publish_white_24dp"
+        android:icon="@mipmap/ic_export_white_24dp"
         android:visible="true"
         android:title="@string/card_menu_export" />
+    <item
+        android:id="@+id/cardmenu_send_ftp"
+        android:icon="@mipmap/ic_send_white_24dp"
+        android:visible="true"
+        android:title="@string/card_menu_send_ftp"/>
     <item
         android:id="@+id/cardmenu_delete"
         android:icon="@mipmap/ic_delete_white_24dp"

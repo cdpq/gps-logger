@@ -106,6 +106,7 @@
 
     <!-- Context menu of Tracklist -->
     <string name="card_menu_export">Export</string>
+    <string name="card_menu_send_ftp">Send via FTP</string>
     <string name="card_menu_view_selector">View in ...</string>
     <string name="card_menu_view">View in %1$s</string>
     <string name="card_menu_delete">Delete</string>
@@ -175,6 +176,12 @@
     <string name="pref_AltitudeCorrection_summary_not_defined">No offset defined</string>
 
     <string name="pref_category_exporting">EXPORTATION</string>
+    <string name="pref_export_when_completed">Export Tracks When Completed</string>
+    <string name="pref_export_when_completed_summary">Whether or not tracks should be automatically exported when completed</string>
+    <string name="pref_file_name_prefix">File Name Prefix</string>
+    <string name="pref_file_name_prefix_summary">Enter file name prefix</string>
+    <string name="pref_track_id_as_suffix">Use Track ID as Suffix</string>
+    <string name="pref_track_id_as_suffix_summary">Add the track ID in the file name</string>
     <string name="pref_export_TXT">Export Tracks in TXT</string>
     <string name="pref_export_TXT_summary">Plain text, comma-separated values</string>
     <string name="pref_TXT_system_of_measurement">TXT Units of measurement</string>
@@ -193,11 +200,36 @@
     <string name="pref_track_stats_totaltime">Total time</string>
     <string name="pref_track_stats_movingtime">Moving time</string>
 
+    <string name="pref_category_FTP">FTP</string>
+    <string name="pref_FTP_test_connection">Test FTP Connection</string>
+    <string name="pref_FTP_test_connection_summary">Click me to test the FTP connection</string>
+    <string name="pref_FTP_transfer_when_completed">Send Tracks When Exported</string>
+    <string name="pref_FTP_transfer_when_completed_summary">Whether or not tracks should be automatically sent when exported</string>
+    <string name="pref_FTP_host">Host</string>
+    <string name="pref_FTP_host_summary">Enter host</string>
+    <string name="pref_FTP_port">Port</string>
+    <string name="pref_FTP_port_summary">21</string>
+    <string name="pref_FTP_user">User</string>
+    <string name="pref_FTP_user_summary">Enter user</string>
+    <string name="pref_FTP_password">Password</string>
+    <string name="pref_FTP_password_summary">Enter password</string>
+    <string name="pref_FTP_path">Directory</string>
+    <string name="pref_FTP_path_summary">Enter the directory in which the files will be sent</string>
+    <string name="pref_FTP_encryption">Security</string>
+    <string name="pref_FTP_encryption_summary">The FTP security type</string>
+    <string name="pref_FTP_encryption_ftp">Standard FTP security level</string>
+    <string name="pref_FTP_encryption_ftps">FTP over implicit TSL/SSL security level</string>
+    <string name="pref_FTP_encryption_ftpes">FTP over explicit TSL/SSL security level</string>
+
     <!-- Preferences toasts -->
     <string name="toast_download_error">Download error</string>
     <string name="toast_download_completed">Download completed</string>
     <string name="toast_download_failed">Download failed. Try again later</string>
     <string name="toast_active_track_not_empty">The active track is not empty</string>
+    <string name="toast_ftp_connection_test_failed">The FTP connection is not working</string>
+    <string name="toast_ftp_connection_test_succeeded">The FTP connection is working</string>
+    <string name="toast_ftp_send_success">Tracks sent via FTP to</string>
+    <string name="toast_ftp_send_failure">Failed to send the tracks via FTP to</string>
 
     <!-- About Dialog -->
     <string name="about_version">ver.</string>

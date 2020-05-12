@@ -67,14 +67,60 @@
             android:paddingBottom="8dp"
             android:background="@color/colorCardBackground_Title">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:id="@+id/id_textView_card_TrackName"
-                android:textColor="@color/textColorCardTitle"
-                android:textStyle="bold"
-                android:paddingTop="1dp" />
+                android:layout_height="24dp"
+                android:orientation="horizontal"
+                android:id="@+id/id_card_mainInfo"
+                android:paddingTop="1dp" >
+
+                <!-- Last four lines are for the ellipses -->
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/textColorCardTitle"
+                    android:id="@+id/id_textView_card_TrackName"
+                    android:textStyle="bold"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
+                    android:maxLines="1" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/id_imageView_card_Transferred"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginLeft="5dp"
+                        android:clickable="false"
+                        android:src="@mipmap/ic_send_white_24dp"
+                        android:visibility="gone" />
+
+                    <ImageView
+                        android:id="@+id/id_imageView_card_Exported"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginLeft="5dp"
+                        android:clickable="false"
+                        android:src="@mipmap/ic_export_white_24dp"
+                        android:visibility="gone" />
+
+                    <ImageView
+                        android:id="@+id/id_imageView_card_tracktype"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginLeft="5dp"
+                        android:clickable="false" />
+                </LinearLayout>
+
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -83,17 +129,8 @@
                 android:id="@+id/id_textView_card_TrackDesc"
                 android:textStyle="italic"
                 android:paddingBottom="2dp"
-                android:layout_below="@id/id_textView_card_TrackName"/>
+                android:layout_below="@id/id_card_mainInfo"/>
         </RelativeLayout>
-
-        <ImageView
-            android:id="@+id/id_imageView_card_tracktype"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_margin="7dp"
-            android:clickable="false"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true" />
 
         <View
             android:layout_width="match_parent"

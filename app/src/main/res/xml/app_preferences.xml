@@ -129,6 +129,23 @@
         android:title="@string/pref_category_exporting">
 
         <android.support.v7.preference.SwitchPreferenceCompat
+            android:key="prefExportWhenCompleted"
+            android:title="@string/pref_export_when_completed"
+            android:summary="@string/pref_export_when_completed_summary"
+            android:defaultValue="false" />
+
+        <android.support.v7.preference.EditTextPreference
+            android:key="prefFileNamePrefix"
+            android:title="@string/pref_file_name_prefix"
+            android:summary="@string/pref_file_name_prefix_summary" />
+
+        <android.support.v7.preference.SwitchPreferenceCompat
+            android:key="prefTrackIDAsSuffix"
+            android:title="@string/pref_track_id_as_suffix"
+            android:summary="@string/pref_track_id_as_suffix_summary"
+            android:defaultValue="false" />
+
+        <android.support.v7.preference.SwitchPreferenceCompat
             android:key="prefExportTXT"
             android:title="@string/pref_export_TXT"
             android:summary="@string/pref_export_TXT_summary"
@@ -161,6 +178,58 @@
             android:entries="@array/KMLAltitudeMode"
             android:entryValues="@array/KMLAltitudeModeValues"
             android:defaultValue="1" />
+
+    </android.support.v7.preference.PreferenceCategory>
+
+    <android.support.v7.preference.PreferenceCategory
+        android:title="@string/pref_category_FTP">
+
+        <Preference
+            android:key="@string/key_prefs_ftp_test_connection"
+            android:title="@string/pref_FTP_test_connection"
+            android:summary="@string/pref_FTP_test_connection_summary" />
+
+        <android.support.v7.preference.SwitchPreferenceCompat
+            android:key="@string/key_prefs_ftp_transfer_when_completed"
+            android:title="@string/pref_FTP_transfer_when_completed"
+            android:summary="@string/pref_FTP_transfer_when_completed_summary"
+            android:defaultValue="false" />
+
+        <android.support.v7.preference.EditTextPreference
+            android:key="@string/key_prefs_ftp_host"
+            android:title="@string/pref_FTP_host"
+            android:summary="@string/pref_FTP_host_summary" />
+
+        <android.support.v7.preference.EditTextPreference
+            android:key="@string/key_prefs_ftp_port"
+            android:title="@string/pref_FTP_port"
+            android:defaultValue="21"
+            android:summary="@string/pref_FTP_port_summary"
+            android:dialogLayout="@layout/preference_edit_number" />
+
+        <android.support.v7.preference.EditTextPreference
+            android:key="@string/key_prefs_ftp_user"
+            android:title="@string/pref_FTP_user"
+            android:summary="@string/pref_FTP_user_summary" />
+
+        <android.support.v7.preference.EditTextPreference
+            android:key="@string/key_prefs_ftp_password"
+            android:title="@string/pref_FTP_password"
+            android:summary="@string/pref_FTP_password_summary"
+            android:dialogLayout="@layout/preference_edit_password" />
+
+        <android.support.v7.preference.EditTextPreference
+            android:key="@string/key_prefs_ftp_path"
+            android:title="@string/pref_FTP_path"
+            android:summary="@string/pref_FTP_path_summary" />
+
+        <android.support.v7.preference.ListPreference
+            android:key="@string/key_prefs_ftp_encryption"
+            android:title="@string/pref_FTP_encryption"
+            android:summary="@string/pref_FTP_encryption_summary"
+            android:entries="@array/pref_FTP_encryption"
+            android:entryValues="@array/pref_FTP_encryption_values"
+            android:defaultValue="0" />
 
     </android.support.v7.preference.PreferenceCategory>
 

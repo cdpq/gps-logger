@@ -92,7 +92,7 @@ class EGM96 {
         //listener.onEGMGridLoaded(isEGMGridLoaded);
         EventBus.getDefault().post(EventBusMSG.UPDATE_FIX);
         EventBus.getDefault().post(EventBusMSG.UPDATE_TRACK);
-        EventBus.getDefault().post(EventBusMSG.UPDATE_TRACKLIST);
+        EventBus.getDefault().post(EventBusMSG.TRACKLIST_UPDATED);
     }
 
     public boolean isEGMGridLoaded() {
@@ -260,7 +260,7 @@ class EGM96 {
             }
             EventBus.getDefault().post(EventBusMSG.UPDATE_FIX);
             EventBus.getDefault().post(EventBusMSG.UPDATE_TRACK);
-            EventBus.getDefault().post(EventBusMSG.UPDATE_TRACKLIST);
+            EventBus.getDefault().post(EventBusMSG.TRACKLIST_UPDATED);
             //listener.onEGMGridLoaded(isEGMGridLoaded);
         }
     }

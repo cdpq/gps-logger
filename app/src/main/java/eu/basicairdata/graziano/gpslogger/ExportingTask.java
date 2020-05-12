@@ -30,6 +30,7 @@ public class ExportingTask {
     private long    NumberOfPoints_Processed    = 0;
     private short   Status                      = STATUS_PENDING;
     private String  Name                        = "";
+    private Track   track                       = null;
 
 
     public long getId() {
@@ -71,5 +72,9 @@ public class ExportingTask {
     public void setName(String name) {
         Name = name;
     }
+
+    public Track getTrack() { return track; }
+
+    public void setTrack(Track track) { this.track = track; }
 }
 

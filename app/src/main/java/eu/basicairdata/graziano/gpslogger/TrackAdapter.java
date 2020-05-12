@@ -23,6 +23,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.ColorMatrixColorFilter;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,6 +92,8 @@ class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackHolder> {
         private final ImageView imageViewThumbnail;
         private final ImageView imageViewPulse;
         private final ImageView imageViewIcon;
+        private final ImageView imageViewTrackExported;
+        private final ImageView imageViewTrackTransferred;
 
 
         @Override
@@ -127,6 +130,8 @@ class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackHolder> {
             imageViewThumbnail          = itemView.findViewById(R.id.id_imageView_card_minimap);
             imageViewPulse              = itemView.findViewById(R.id.id_imageView_card_pulse);
             imageViewIcon               = itemView.findViewById(R.id.id_imageView_card_tracktype);
+            imageViewTrackExported      = itemView.findViewById(R.id.id_imageView_card_Exported);
+            imageViewTrackTransferred   = itemView.findViewById(R.id.id_imageView_card_Transferred);
 
             if (isLightTheme) {
                 imageViewThumbnail.setColorFilter(colorMatrixColorFilter);
@@ -177,6 +182,9 @@ class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackHolder> {
                 imageViewPulse.setVisibility(View.INVISIBLE);
                 imageViewThumbnail.setImageBitmap(bmpCurrentTrackPaused);
             }
+
+            imageViewTrackExported.setVisibility(trk.getExported() ? View.VISIBLE : View.GONE);
+            imageViewTrackTransferred.setVisibility(trk.getTransferred() ? View.VISIBLE : View.GONE);
         }
 
 
@@ -228,6 +236,9 @@ class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackHolder> {
                         .dontAnimate()
                         .into(imageViewThumbnail);
             }
+
+            imageViewTrackExported.setVisibility(track.getExported() ? View.VISIBLE : View.GONE);
+            imageViewTrackTransferred.setVisibility(track.getTransferred() ? View.VISIBLE : View.GONE);
         }
     }
 

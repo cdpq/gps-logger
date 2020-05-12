@@ -31,6 +31,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -66,6 +67,10 @@ import java.util.StringTokenizer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import eu.basicairdata.graziano.gpslogger.ftp.FTPTransferTask;
+import eu.basicairdata.graziano.gpslogger.ftp.FTPTransferThread;
+import it.sauronsoftware.ftp4j.FTPClient;
+
 public class GPSApplication extends Application implements GpsStatus.Listener, LocationListener {
 
     //private static final float M_TO_FT = 3.280839895f;
@@ -96,6 +101,7 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
     public static final int JOB_TYPE_VIEW       = 2;                // Bulk View
     public static final int JOB_TYPE_SHARE      = 3;                // Bulk Share
     public static final int JOB_TYPE_DELETE     = 4;                // Bulk Delete
+    public static final int JOB_TYPE_SEND_FTP  = 5;                // Bulk Send, via FTP
 
     public static final String FLAG_RECORDING   = "flagRecording";  // The persistent Flag is set when the app is recording, in order to detect Background Crashes
 
@@ -106,17 +112,18 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
     private int     prefViewTracksWith          = 0;
     private int     prefUM                      = UM_METRIC_KMH;
     private float   prefGPSdistance             = 0f;
-    private long    prefGPSupdatefrequency      = 1000L;
+    private long    prefGPSUpdateFrequency      = 1000L;
     private boolean prefEGM96AltitudeCorrection = false;
     private double  prefAltitudeCorrection      = 0d;
-    private boolean prefExportKML               = true;
-    private boolean prefExportGPX               = true;
+    //private boolean prefExportKML               = true;
+    //private boolean prefExportGPX               = true;
     private int     prefGPXVersion              = 100;            // the version of the GPX schema
-    private boolean prefExportTXT               = false;
+    //private boolean prefExportTXT               = false;
     private int     prefKMLAltitudeMode         = 0;
     private int     prefShowTrackStatsType      = 0;
     private int     prefShowDirections          = 0;
     private boolean prefGPSWeekRolloverCorrected= false;
+    private boolean prefFTPExportWhenDone       = false;
 
     private boolean LocationPermissionChecked   = false;          // If the flag is false the GPSActivity will check for Location Permission
     private boolean isFirstRun                  = false;          // True if it is the first run of the app (the DB is empty)
@@ -180,6 +187,8 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
     public int JobType = JOB_TYPE_NONE;                     // The type of job that is pending
     private boolean DeleteAlsoExportedFiles = false;        // When true, the deletion of some tracks will delete also the exported files of the tracks
 
+    private FTPClient ftp = null;
+
     public int GPSActivityColorTheme;
 
     private int _Stabilizer = StabilizingSamples;
@@ -217,13 +226,59 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
     };
 
     private final int MAX_ACTIVE_EXPORTER_THREADS = 3;      // The maximum number of Exporter threads to run simultaneously
+    private final int MAX_ACTIVE_FTP_TRANSFER_THREADS = 1;
 
     private List<ExportingTask> ExportingTaskList = new ArrayList<>();
+    private List<FTPTransferTask> FTPTransferTaskList = new ArrayList<>();
 
 
     // The handler that checks the progress of an exportation:
     private final int ExportingStatusCheckInterval = 16;          // The app updates the progress of exportation every 16 milliseconds
     final Handler ExportingStatusCheckHandler = new Handler();
+
+    // The handler that checks the progress of a FTP transfer:
+    private final int FTPTransferStatusCheckInterval = 16;
+    final Handler FTPTransferStatusCheckHandler = new Handler();
+
+    Runnable FTPTransferStatusChecker = new Runnable() {
+        @Override
+        public void run() {
+            int numTask = FTPTransferTaskList.size();
+            int numPendingTask = 0;
+            int numStartedTask = 0;
+            int numSuccessTask = 0;
+            int numFailedTask = 0;
+
+            for (FTPTransferTask task : FTPTransferTaskList) {
+                if (task.getStatus() == FTPTransferTask.STATUS_PENDING) numPendingTask++;
+                if (task.getStatus() == FTPTransferTask.STATUS_STARTED) numStartedTask++;
+                if (task.getStatus() == FTPTransferTask.STATUS_SUCCESS) numSuccessTask++;
+                if (task.getStatus() == FTPTransferTask.STATUS_FAILED) numFailedTask++;
+            }
+
+            if (numFailedTask == numTask) {
+                EventBus.getDefault().post(EventBusMSG.TOAST_TRACK_SEND_FTP_FAILED);
+                JobsPending = 0;
+                return;
+            }
+
+            if (numSuccessTask == numTask) {
+                EventBus.getDefault().post(EventBusMSG.TOAST_TRACK_SEND_FTP_SUCCESS);
+                JobsPending = 0;
+                return;
+            }
+
+            FTPTransferStatusCheckHandler.postDelayed(FTPTransferStatusChecker, FTPTransferStatusCheckInterval);
+        }
+    };
+
+    void startFTPTransferStatusChecker() {
+        FTPTransferStatusChecker.run();
+    }
+
+    void stopFTPTransferStatusChecker() {
+        FTPTransferStatusCheckHandler.removeCallbacks(FTPTransferStatusChecker);
+    }
 
     Runnable ExportingStatusChecker = new Runnable() {
         @Override
@@ -311,7 +366,6 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
         ExportingStatusCheckHandler.removeCallbacks(ExportingStatusChecker);
     }
 
-
     // ------------------------------------------------------------------------------------ Service
     Intent GPSServiceIntent;
     GPSService GPSLoggerService;
@@ -374,6 +428,10 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
 
 
     // ------------------------------------------------------------------------ Getters and Setters
+    public DatabaseHandler getGPSDataBase() {
+        return this.GPSDataBase;
+    }
+
     public boolean getNewTrackFlag() {
         return NewTrackFlag;
     }
@@ -457,15 +515,18 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
     }
 
     public boolean getPrefExportKML() {
-        return prefExportKML;
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return preferences.getBoolean("prefExportKML", false);
     }
 
     public boolean getPrefExportGPX() {
-        return prefExportGPX;
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return preferences.getBoolean("prefExportGPX", false);
     }
 
     public boolean getPrefExportTXT() {
-        return prefExportTXT;
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return preferences.getBoolean("prefExportTXT", false);
     }
 
     public int getPrefUM() {
@@ -478,6 +539,48 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
 
     public int getPrefShowDirections() {
         return prefShowDirections;
+    }
+
+    public boolean getPrefFTPTransferWhenCompleted() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return preferences.getBoolean("prefFTPTransferWhenCompleted", false);
+    }
+
+    public String getPrefFTPHost() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return preferences.getString("prefFTPHost", "");
+    }
+
+    public int getPrefFTPPort() {
+        Resources resources = getResources();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return Integer.parseInt(preferences.getString(resources.getString(R.string.key_prefs_ftp_port), "21"));
+    }
+
+    public String getPrefFTPUser() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return preferences.getString("prefFTPUser", "");
+    }
+
+    public String getPrefFTPPassword() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return preferences.getString("prefFTPPassword", "");
+    }
+
+    public String getPrefFTPPath() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return preferences.getString("prefFTPPath", "");
+    }
+
+    public int getPrefFTPEncryption() {
+        Resources resources = getResources();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return Integer.parseInt(preferences.getString(resources.getString(R.string.key_prefs_ftp_encryption), "0"));
+    }
+
+    public boolean getPrefExportWhenCompleted() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return preferences.getBoolean("prefExportWhenCompleted", false);
     }
 
     public LocationExtended getCurrentLocationExtended() {
@@ -700,11 +803,11 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
         GPSDataBase = new DatabaseHandler(this);                                 // Initialize the Database
 
         // Prepare the current track
-        if (GPSDataBase.getLastTrackID() == 0) {
+        if (GPSDataBase.getLastTrackIDSync() == 0) {
             GPSDataBase.addTrack(new Track());                                          // Creation of the first track if the DB is empty
             isFirstRun = true;
         }
-        _currentTrack = GPSDataBase.getLastTrack();                                     // Get the last track
+        _currentTrack = GPSDataBase.getLastTrackSync();                                     // Get the last track
 
         LoadPreferences();                                                              // Load Settings
 
@@ -770,6 +873,10 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
             MustUpdatePrefs = true;
             return;
         }
+        if (msg == EventBusMSG.UPDATE_TRACKLIST) {
+            UpdateTrackList();
+            return;
+        }
     }
 
 
@@ -786,10 +893,10 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
         if (state && !isGPSLocationUpdatesActive
                 && (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
             mlocManager.addGpsStatusListener(this);
-            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, prefGPSupdatefrequency, 0, this); // Requires Location update
+            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, prefGPSUpdateFrequency, 0, this); // Requires Location update
             isGPSLocationUpdatesActive = true;
             //Log.w("myApp", "[#] GPSApplication.java - setGPSLocationUpdates = true");
-            if (prefGPSupdatefrequency >= 1000) StabilizingSamples = (int) Math.ceil(STABILIZERVALUE / prefGPSupdatefrequency);
+            if (prefGPSUpdateFrequency >= 1000) StabilizingSamples = (int) Math.ceil(STABILIZERVALUE / prefGPSUpdateFrequency);
             else StabilizingSamples = (int) Math.ceil(STABILIZERVALUE / 1000);
         }
     }
@@ -800,14 +907,14 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
             //Log.w("myApp", "[#] GPSApplication.java - updateGPSLocationFrequency");
             mlocManager.removeGpsStatusListener(this);
             mlocManager.removeUpdates(this);
-            if (prefGPSupdatefrequency >= 1000) StabilizingSamples = (int) Math.ceil(STABILIZERVALUE / prefGPSupdatefrequency);
+            if (prefGPSUpdateFrequency >= 1000) StabilizingSamples = (int) Math.ceil(STABILIZERVALUE / prefGPSUpdateFrequency);
             else StabilizingSamples = (int) Math.ceil(STABILIZERVALUE / 1000);
             mlocManager.addGpsStatusListener(this);
-            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, prefGPSupdatefrequency, 0, this);
+            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, prefGPSUpdateFrequency, 0, this);
         }
     }
 
-    public void updateSats() {
+    public void updateStats() {
         try {
             if ((mlocManager != null) && (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
                 GpsStatus gs = mlocManager.getGpsStatus(null);
@@ -908,21 +1015,88 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
 
 
     public void LoadJob (int jobType) {
-        ExportingTaskList.clear();
-        synchronized(_ArrayListTracks) {
-            for (Track T : _ArrayListTracks) {
-                if (T.isSelected()) {
-                    ExportingTask ET = new ExportingTask();
-                    ET.setId(T.getId());
-                    ET.setName(T.getName());
-                    ET.setNumberOfPoints_Total(T.getNumberOfLocations() + T.getNumberOfPlacemarks());
-                    ET.setNumberOfPoints_Processed(0);
-                    ExportingTaskList.add(ET);
+        if (jobType <= 4) {
+            ExportingTaskList.clear();
+
+            synchronized(_ArrayListTracks) {
+                for (Track T : _ArrayListTracks) {
+                    if (T.isSelected()) {
+                        ExportingTask ET = new ExportingTask();
+                        ET.setId(T.getId());
+                        ET.setName(T.getName());
+                        ET.setNumberOfPoints_Total(T.getNumberOfLocations() + T.getNumberOfPlacemarks());
+                        ET.setNumberOfPoints_Processed(0);
+                        ET.setTrack(T);
+                        ExportingTaskList.add(ET);
+                    }
                 }
             }
+
+            JobsPending = ExportingTaskList.size();
+            JobType = jobType;
+        } else if (jobType == JOB_TYPE_SEND_FTP) {
+            FTPTransferTaskList.clear();
+
+            synchronized (_ArrayListTracks) {
+                for (Track track : _ArrayListTracks) {
+                    if (track.isSelected()) {
+                        File txtFile = track.getTXTFile();
+                        File kmlFile = track.getKMLFile();
+                        File gpxFile = track.getGPXFile();
+
+                        if (txtFile != null) {
+                            FTPTransferTask task = new FTPTransferTask(txtFile, track);
+                            FTPTransferTaskList.add(task);
+                            Log.w("myApp", "LoadJob: New FTPTransferTask for " + txtFile.getPath());
+                        }
+
+                        if (kmlFile != null) {
+                            FTPTransferTask task = new FTPTransferTask(kmlFile, track);
+                            FTPTransferTaskList.add(task);
+                            Log.w("myApp", "LoadJob: New FTPTransferTask for " + kmlFile.getPath());
+                        }
+
+                        if (gpxFile != null) {
+                            FTPTransferTask task = new FTPTransferTask(gpxFile, track);
+                            FTPTransferTaskList.add(task);
+                            Log.w("myApp", "LoadJob: New FTPTransferTask for " + gpxFile.getPath());
+                        }
+                    }
+                }
+            }
+
+            JobsPending = FTPTransferTaskList.size();
+            JobType = jobType;
         }
-        JobsPending = ExportingTaskList.size();
-        JobType = jobType;
+    }
+
+    public void LoadFTPTransferTask(Track track) {
+        FTPTransferTaskList.clear();
+
+        File txtFile = track.getTXTFile();
+        File kmlFile = track.getKMLFile();
+        File gpxFile = track.getGPXFile();
+
+        if (txtFile != null) {
+            FTPTransferTask task = new FTPTransferTask(txtFile, track);
+            FTPTransferTaskList.add(task);
+            Log.w("myApp", "LoadJob: New FTPTransferTask for " + txtFile.getPath());
+        }
+
+        if (kmlFile != null) {
+            FTPTransferTask task = new FTPTransferTask(kmlFile, track);
+            FTPTransferTaskList.add(task);
+            Log.w("myApp", "LoadJob: New FTPTransferTask for " + kmlFile.getPath());
+        }
+
+        if (gpxFile != null) {
+            FTPTransferTask task = new FTPTransferTask(gpxFile, track);
+            FTPTransferTaskList.add(task);
+            Log.w("myApp", "LoadJob: New FTPTransferTask for " + gpxFile.getPath());
+        }
+
+        JobsPending = FTPTransferTaskList.size();
+        JobType = JOB_TYPE_SEND_FTP;
     }
 
 
@@ -932,7 +1106,7 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
             case JOB_TYPE_DELETE:
                 break;
             case JOB_TYPE_EXPORT:
-                Ex = new Exporter(exportingTask, prefExportKML, prefExportGPX, prefExportTXT, Environment.getExternalStorageDirectory() + "/GPSLogger");
+                Ex = new Exporter(exportingTask, getPrefExportKML(), getPrefExportGPX(), getPrefExportTXT(), Environment.getExternalStorageDirectory() + "/GPSLogger");
                 Ex.start();
                 break;
             case JOB_TYPE_VIEW:
@@ -941,7 +1115,7 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
                 Ex.start();
                 break;
             case JOB_TYPE_SHARE:
-                Ex = new Exporter(exportingTask, prefExportKML, prefExportGPX, prefExportTXT, Environment.getExternalStorageDirectory() + "/GPSLogger/AppData");
+                Ex = new Exporter(exportingTask, getPrefExportKML(), getPrefExportGPX(), getPrefExportTXT(), Environment.getExternalStorageDirectory() + "/GPSLogger/AppData");
                 Ex.start();
                 break;
             default:
@@ -949,34 +1123,41 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
         }
     }
 
+    public void ExecuteFTPTransferTask(List<FTPTransferTask> tasks) {
+        if (tasks == null) { throw new IllegalArgumentException("Tasks should not be null"); }
+
+        FTPTransferThread newThread = new FTPTransferThread(tasks);
+        newThread.start();
+    }
 
     public void ExecuteJob () {
-        if (!ExportingTaskList.isEmpty()) {
-            switch (JobType) {
-                case JOB_TYPE_NONE:
-                    break;
-                case JOB_TYPE_DELETE:
-                    String S = "TASK_DELETE_TRACKS";
-                    for (ExportingTask ET : ExportingTaskList) {
-                        S = S + " " + ET.getId();
-                    }
-                    AsyncTODO ast = new AsyncTODO();
-                    ast.TaskType = S;
-                    ast.location = null;
-                    AsyncTODOQueue.add(ast);
-                    break;
-                case JOB_TYPE_EXPORT:
-                case JOB_TYPE_VIEW:
-                case JOB_TYPE_SHARE:
-                    startExportingStatusChecker();
-                    break;
-                default:
-                    break;
-            }
-        } else {
-            Log.w("myApp", "[#] GPSApplication.java - Empty Job, nothing processed");
-            JobProgress = 0;
-            JobsPending = 0;
+        switch (JobType) {
+            case JOB_TYPE_NONE:
+                break;
+            case JOB_TYPE_DELETE:
+                String S = "TASK_DELETE_TRACKS";
+                for (ExportingTask ET : ExportingTaskList) {
+                    S = S + " " + ET.getId();
+                }
+                AsyncTODO ast = new AsyncTODO();
+                ast.TaskType = S;
+                ast.location = null;
+                AsyncTODOQueue.add(ast);
+                break;
+            case JOB_TYPE_EXPORT:
+            case JOB_TYPE_VIEW:
+            case JOB_TYPE_SHARE:
+                startExportingStatusChecker();
+                break;
+            case JOB_TYPE_SEND_FTP:
+                ExecuteFTPTransferTask(FTPTransferTaskList);
+                startFTPTransferStatusChecker();
+                break;
+            default:
+                Log.w("myApp", "[#] GPSApplication.java - Empty Job, nothing processed");
+                JobProgress = 0;
+                JobsPending = 0;
+                break;
         }
     }
 
@@ -1039,7 +1220,7 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
                 // TODO: get here the status of the GPS, and save into a GpsStatus to be used for satellites visualization;
                 // Use GpsStatus getGpsStatus (GpsStatus status)
                 // https://developer.android.com/reference/android/location/LocationManager.html#getGpsStatus(android.location.GpsStatus)
-                updateSats();
+                updateStats();
                 break;
         }
     }
@@ -1171,7 +1352,9 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
 
 
     public void UpdateTrackList() {
-        long ID = GPSDataBase.getLastTrackID();
+        Log.w("myApp", "UpdateTrackList");
+
+        long ID = GPSDataBase.getLastTrackIDSync();
         List<Track> _OldArrayListTracks = new ArrayList<Track>();
         _OldArrayListTracks.addAll(_ArrayListTracks);
 
@@ -1185,8 +1368,8 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
 
                 // Update the List
                 _ArrayListTracks.clear();
-                _ArrayListTracks.addAll(GPSDataBase.getTracksList(0, ID - 1));
-                if ((ID > 1) && (GPSDataBase.getTrack(ID - 1) != null)) {
+                _ArrayListTracks.addAll(GPSDataBase.getTrackListSync(0, ID - 1));
+                if ((ID > 1) && (GPSDataBase.getTrackByIdSync(ID - 1) != null)) {
                     String fname = (ID - 1) + ".png";
                     File file = new File(getApplicationContext().getFilesDir() + "/Thumbnails/", fname);
                     if (!file.exists()) Th = new Thumbnailer(ID - 1);
@@ -1207,8 +1390,8 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
                     }
                 }
             }
-            EventBus.getDefault().post(EventBusMSG.UPDATE_TRACKLIST);
-            //Log.w("myApp", "[#] GPSApplication.java - Update Tracklist: Added " + _ArrayListTracks.size() + " tracks");
+
+            EventBus.getDefault().post(EventBusMSG.TRACKLIST_UPDATED);
         }
     }
 
@@ -1229,7 +1412,6 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
         }
 
         // ---------Remove the prefIsStoragePermissionChecked in preferences if present
-
         if (preferences.contains("prefIsStoragePermissionChecked")) {
             SharedPreferences.Editor editor = preferences.edit();
             editor.remove("prefIsStoragePermissionChecked");
@@ -1237,8 +1419,6 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
         }
 
         // -----------------------------------------------------------------------
-
-        //prefKeepScreenOn = preferences.getBoolean("prefKeepScreenOn", true);
         prefGPSWeekRolloverCorrected = preferences.getBoolean("prefGPSWeekRolloverCorrected", false);
         prefShowDecimalCoordinates = preferences.getBoolean("prefShowDecimalCoordinates", false);
         prefViewTracksWith = Integer.valueOf(preferences.getString("prefViewTracksWith", "0"));
@@ -1246,28 +1426,17 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
         prefGPSdistance = Float.valueOf(preferences.getString("prefGPSdistance", "0"));
         prefEGM96AltitudeCorrection = preferences.getBoolean("prefEGM96AltitudeCorrection", false);
         prefAltitudeCorrection = Double.valueOf(preferences.getString("prefAltitudeCorrection", "0"));
-            Log.w("myApp", "[#] GPSApplication.java - Manual Correction set to " + prefAltitudeCorrection + " m");
-        prefExportKML = preferences.getBoolean("prefExportKML", true);
-        prefExportGPX = preferences.getBoolean("prefExportGPX", true);
-        prefExportTXT = preferences.getBoolean("prefExportTXT", false);
+        Log.w("myApp", "[#] GPSApplication.java - Manual Correction set to " + prefAltitudeCorrection + " m");
         prefKMLAltitudeMode = Integer.valueOf(preferences.getString("prefKMLAltitudeMode", "1"));
-        prefGPXVersion = Integer.valueOf(preferences.getString("prefGPXVersion", "100"));               // Default value = v.1.0
+        prefGPXVersion = Integer.valueOf(preferences.getString("prefGPXVersion", "100")); // Default value = v.1.0
         prefShowTrackStatsType = Integer.valueOf(preferences.getString("prefShowTrackStatsType", "0"));
         prefShowDirections = Integer.valueOf(preferences.getString("prefShowDirections", "0"));
 
-        long oldGPSupdatefrequency = prefGPSupdatefrequency;
-        prefGPSupdatefrequency = Long.valueOf(preferences.getString("prefGPSupdatefrequency", "1000"));
+        long oldGPSUpdateFrequency = prefGPSUpdateFrequency;
+        prefGPSUpdateFrequency = Long.valueOf(preferences.getString("prefGPSupdatefrequency", "1000"));
 
         // ---------------------------------------------- Update the GPS Update Frequency if needed
-        if (oldGPSupdatefrequency != prefGPSupdatefrequency) updateGPSLocationFrequency();
-
-        // ---------------------------------------------------------------- If no Exportation formats are enabled, enable the GPX one
-        if (!prefExportKML && !prefExportGPX && !prefExportTXT) {
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putBoolean("prefExportGPX", true);
-            editor.commit();
-            prefExportGPX = true;
-        }
+        if (oldGPSUpdateFrequency != prefGPSUpdateFrequency) updateGPSLocationFrequency();
 
         // ---------------------------------------------------------------- Load EGM Grid if needed
         EGM96 egm96 = EGM96.getInstance();
@@ -1281,12 +1450,11 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
         EventBus.getDefault().post(EventBusMSG.APPLY_SETTINGS);
         EventBus.getDefault().post(EventBusMSG.UPDATE_FIX);
         EventBus.getDefault().post(EventBusMSG.UPDATE_TRACK);
-        EventBus.getDefault().post(EventBusMSG.UPDATE_TRACKLIST);
+        EventBus.getDefault().post(EventBusMSG.TRACKLIST_UPDATED);
     }
 
 
 // THE THREAD THAT DOES ASYNCHRONOUS OPERATIONS ---------------------------------------------------
-
 
     class AsyncTODO {
         String TaskType;
@@ -1350,6 +1518,7 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
                         track = new Track();
                         // ----
                         track.setId(GPSDataBase.addTrack(track));
+                        Log.w("myApp", "[#] GPSApplication.java - TASK_NEWTRACK: " + track.getName());
                         Log.w("myApp", "[#] GPSApplication.java - TASK_NEWTRACK: " + track.getId());
                         _currentTrack = track;
                         UpdateTrackList();
@@ -1489,7 +1658,7 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
 
         public Thumbnailer(long ID) {
 
-            Track track = GPSDataBase.getTrack(ID);
+            Track track = GPSDataBase.getTrackByIdSync(ID);
             //Log.w("myApp", "[#] GPSApplication.java - Bitmap Size = " + Size);
 
             if ((track.getNumberOfLocations() > 2) && (track.getDistance() >= 15) && (track.getValidMap() != 0)) {

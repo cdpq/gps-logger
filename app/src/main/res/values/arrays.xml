@@ -148,4 +148,16 @@
         <item>1</item>
         <item>2</item>
     </string-array>
+
+    <!-- FTP Encryption -->
+    <string-array name="pref_FTP_encryption">
+        <item>@string/pref_FTP_encryption_ftp</item>
+        <item>@string/pref_FTP_encryption_ftps</item>
+        <item>@string/pref_FTP_encryption_ftpes</item>
+    </string-array>
+    <string-array name="pref_FTP_encryption_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>-array>
 </resources>

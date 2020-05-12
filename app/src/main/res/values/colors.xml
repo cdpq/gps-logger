@@ -58,4 +58,7 @@
     <color name="colorRoundedCornerTop_Light">#ffffff</color>
     <color name="colorRoundedCornerBorder_Light">#bfbfbf</color>
 
+    <color name="textColorCardTrackExported">#008800</color>
+    <color name="textColorCardTrackTransferred">#008800</color>
+
 </resources>

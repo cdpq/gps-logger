@@ -121,10 +121,9 @@ public class GPSActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         viewPager = findViewById(R.id.id_viewpager);
-        viewPager.setOffscreenPageLimit(3);
+        viewPager.setOffscreenPageLimit(4);
 
         setupViewPager(viewPager);
-
         tabLayout = findViewById(R.id.id_tablayout);
         tabLayout.setTabMode(TabLayout.MODE_FIXED);
         tabLayout.setupWithViewPager(viewPager);
@@ -290,9 +289,19 @@ public class GPSActivity extends AppCompatActivity {
                 // This is the second click
                 GPSApp.setNewTrackFlag(false);
                 GPSApp.setRecording(false);
+
+                if (GPSApp.getPrefExportWhenCompleted())
+                {
+                    GPSApp.getCurrentTrack().setSelected(true);
+                    GPSApp.LoadJob(GPSApplication.JOB_TYPE_EXPORT);
+                    GPSApp.ExecuteJob();
+                    GPSApp.DeselectAllTracks();
+                }
+
                 EventBus.getDefault().post(EventBusMSG.NEW_TRACK);
                 ToastClickAgain.cancel();
                 Toast.makeText(this, getString(R.string.toast_track_saved_into_tracklist), Toast.LENGTH_SHORT).show();
+
             } else {
                 // This is the first click
                 GPSApp.setNewTrackFlag(true); // Start the timer
@@ -317,7 +326,7 @@ public class GPSActivity extends AppCompatActivity {
 
     private void updateBottomSheetPosition() {
         activeTab = tabLayout.getSelectedTabPosition();
-        if (activeTab != 2) {
+        if (activeTab < 2) {
             mBottomSheetBehavior.setPeekHeight(1);
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             //Log.w("myApp", "[#] GPSActivity.java - mBottomSheetBehavior.setPeekHeight(" + bottomSheet.getHeight() +");");
@@ -384,7 +393,7 @@ public class GPSActivity extends AppCompatActivity {
                 FragmentPlacemarkDialog placemarkDialog = new FragmentPlacemarkDialog();
                 placemarkDialog.show(fm, "");
                 break;
-            case EventBusMSG.UPDATE_TRACKLIST:
+            case EventBusMSG.TRACKLIST_UPDATED:
             case EventBusMSG.NOTIFY_TRACKS_DELETED:
                 ActivateActionModeIfNeeded();
                 break;
@@ -409,6 +418,22 @@ public class GPSActivity extends AppCompatActivity {
                     }
                 });
                 break;
+            case EventBusMSG.TOAST_TRACK_SEND_FTP_SUCCESS:
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, getString(R.string.toast_ftp_send_success) + " " + GPSApp.getPrefFTPHost(), Toast.LENGTH_LONG).show();
+                    }
+                });
+                break;
+            case EventBusMSG.TOAST_TRACK_SEND_FTP_FAILED:
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, getString(R.string.toast_ftp_send_failure) + " " + GPSApp.getPrefFTPHost(), Toast.LENGTH_LONG).show();
+                    }
+                });
+                break;
             case EventBusMSG.TOAST_STORAGE_PERMISSION_REQUIRED:
                 runOnUiThread(new Runnable() {
                     @Override
@@ -424,6 +449,7 @@ public class GPSActivity extends AppCompatActivity {
                         Toast.makeText(context, getString(R.string.export_unable_to_write_file), Toast.LENGTH_LONG).show();
                     }
                 });
+                break;
         }
     }
 

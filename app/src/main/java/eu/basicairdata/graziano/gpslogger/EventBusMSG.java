@@ -25,17 +25,22 @@ public class EventBusMSG {
     static final short NEW_TRACK                        =   3;  // Request to create a new track
     static final short UPDATE_FIX                       =   4;  // Notify that a new fix is available
     static final short UPDATE_TRACK                     =   5;  // Notify that the current track stats are updated
-    static final short UPDATE_TRACKLIST                 =   6;  // Notify that the tracklist is changed
-    static final short UPDATE_SETTINGS                  =   7;  // Tell that settings are changed
-    static final short REQUEST_ADD_PLACEMARK            =   8;  // The user ask to add a placemark
-    static final short ADD_PLACEMARK                    =   9;  // The placemark is available
-    static final short APPLY_SETTINGS                   =  10;  // The new settings must be applied
-    static final short TOAST_TRACK_EXPORTED             =  11;  // The exporter has finished to export the track, shows toast
-    static final short TOAST_STORAGE_PERMISSION_REQUIRED=  12;  // The Storage permission is required
-    static final short UPDATE_JOB_PROGRESS              =  13;  // Update the progress of the current Job
-    static final short NOTIFY_TRACKS_DELETED            =  14;  // Notify that some tracks are deleted
-    static final short UPDATE_ACTIONBAR                 =  15;  // Notify that the actionbar must be updated
-    static final short REFRESH_TRACKLIST                =  16;  // Refresh the tracklist, without update it from DB
+    public static final short UPDATE_TRACKLIST          =   6;  // Ask the application to update the tracklist
+    public static final short TRACKLIST_UPDATED         =   7;  // Notify that the tracklist is changed
+    static final short UPDATE_SETTINGS                  =   8;  // Tell that settings are changed
+    static final short REQUEST_ADD_PLACEMARK            =   9;  // The user ask to add a placemark
+    static final short ADD_PLACEMARK                    =  10;  // The placemark is available
+    static final short APPLY_SETTINGS                   =  11;  // The new settings must be applied
+    static final short TOAST_TRACK_EXPORTED             =  12;  // The exporter has finished to export the track, shows toast
+    static final short TOAST_STORAGE_PERMISSION_REQUIRED=  13;  // The Storage permission is required
+    static final short UPDATE_JOB_PROGRESS              =  14;  // Update the progress of the current Job
+    static final short NOTIFY_TRACKS_DELETED            =  15;  // Notify that some tracks are deleted
+    static final short UPDATE_ACTIONBAR                 =  16;  // Notify that the actionbar must be updated
+    public static final short REFRESH_TRACKLIST         =  17;  // Refresh the tracklist, without update it from DB
+    static final short TOAST_TRACK_SEND_FTP_SUCCESS     =  18;  // The FTPTransferThread has successfully sent the tracks, show toast
+    static final short TOAST_TRACK_SEND_FTP_FAILED      =  19;  // The FTPTransferThread has failed to send the tracks, show toast
+    public static final short TOAST_FTP_CONNECTION_TEST_FAILED     =   20;  // The FTP connection test has failed, show toast
+    public static final short TOAST_FTP_CONNECTION_TEST_SUCCEEDED  =   21;  // The FTP connection test has succeeded, show toast
 
     static final short TRACKLIST_DESELECT               =  24;  // The user deselect (into the tracklist) the track with a given id
     static final short TRACKLIST_SELECT                 =  25;  // The user select (into the tracklist) the track with a given id
@@ -46,4 +51,6 @@ public class EventBusMSG {
     static final short ACTION_BULK_EXPORT_TRACKS        =  41;  // Export the selected tracks
     static final short ACTION_BULK_VIEW_TRACKS          =  42;  // View the selected tracks
     static final short ACTION_BULK_SHARE_TRACKS         =  43;  // Share the selected tracks
+    static final short ACTION_BULK_SEND_FTP_TRACKS      =  44;  // Send, via FTP, the selected tracks
+    static final short ACTION_FTP_TEST_CONNECTION       =  45;  // Test the FTP connection
 }

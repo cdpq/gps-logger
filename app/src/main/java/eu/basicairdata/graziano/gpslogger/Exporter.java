@@ -21,6 +21,8 @@ package eu.basicairdata.graziano.gpslogger;
 import android.os.Environment;
 import android.util.Log;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -61,7 +63,8 @@ class Exporter extends Thread {
         this.exportingTask = exportingTask;
         this.exportingTask.setNumberOfPoints_Processed(0);
         this.exportingTask.setStatus(ExportingTask.STATUS_RUNNING);
-        track = GPSApplication.getInstance().GPSDataBase.getTrack(exportingTask.getId());
+//        track = GPSApplication.getInstance().GPSDataBase.getTrack(exportingTask.getId());
+        track = exportingTask.getTrack();
         AltitudeManualCorrection = GPSApplication.getInstance().getPrefAltitudeCorrection();
         EGMAltitudeCorrection = GPSApplication.getInstance().getPrefEGM96AltitudeCorrection();
         getPrefKMLAltitudeMode = GPSApplication.getInstance().getPrefKMLAltitudeMode();
@@ -625,12 +628,15 @@ class Exporter extends Thread {
                 TXTfw.close();
             }
 
+            if (!track.getExported()) {
+                track.setExported(true);
+            }
+
+            GPSApp.GPSDataBase.updateTrackSync(track);
             Log.w("myApp", "[#] Exporter.java - Track "+ track.getId() +" exported in " + (System.currentTimeMillis() - start_Time) + " ms (" + elements_total + " pts @ " + ((1000L * elements_total) / (System.currentTimeMillis() - start_Time)) + " pts/s)");
-            //EventBus.getDefault().post(new EventBusMSGNormal(EventBusMSG.TRACK_EXPORTED, track.getId()));
             exportingTask.setStatus(ExportingTask.STATUS_ENDED_SUCCESS);
         } catch (IOException e) {
             exportingTask.setStatus(ExportingTask.STATUS_ENDED_FAILED);
-            //EventBus.getDefault().post(new EventBusMSGNormal(EventBusMSG.TOAST_UNABLE_TO_WRITE_THE_FILE, track.getId()));
             asyncGeopointsLoader.interrupt();
             Log.w("myApp", "[#] Exporter.java - Unable to write the file: " + e);
         } catch (InterruptedException e) {
@@ -638,8 +644,15 @@ class Exporter extends Thread {
             asyncGeopointsLoader.interrupt();
             Log.w("myApp", "[#] Exporter.java - Interrupted: " + e);
         }
-    }
 
+        EventBus.getDefault().post(EventBusMSG.UPDATE_TRACKLIST);
+
+        // Send track via FTP when it has been exported
+        if (GPSApp.getPrefFTPTransferWhenCompleted()) {
+            GPSApp.LoadFTPTransferTask(track);
+            GPSApp.ExecuteJob();
+        }
+    }
 
     private class AsyncGeopointsLoader extends Thread {
 

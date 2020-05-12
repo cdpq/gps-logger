@@ -22,6 +22,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
@@ -30,6 +31,7 @@ import android.os.Environment;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.ListPreference;
+import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.preference.SwitchPreferenceCompat;
@@ -49,11 +51,14 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
+import eu.basicairdata.graziano.gpslogger.ftp.Ftp4jFTPTestConnection;
 
 public class FragmentSettings extends PreferenceFragmentCompat {
 
@@ -158,6 +163,22 @@ public class FragmentSettings extends PreferenceFragmentCompat {
                     }
                 }
 
+                if (key.equals("prefExportWhenCompleted")) {
+                    SwitchPreferenceCompat pFTPTransferWhenCompleted = (SwitchPreferenceCompat) findPreference("prefFTPTransferWhenCompleted");
+                    if (!sharedPreferences.getBoolean(key, false) && pFTPTransferWhenCompleted.isChecked()) {
+                        pFTPTransferWhenCompleted.setChecked(false);
+                    }
+                }
+
+                if (key.equals("prefFTPTransferWhenCompleted")) {
+                    SwitchPreferenceCompat pExportWhenCompleted = (SwitchPreferenceCompat) findPreference("prefExportWhenCompleted");
+                    if (sharedPreferences.getBoolean(key, false) && !pExportWhenCompleted.isChecked()) {
+                        pExportWhenCompleted.setChecked(true);
+                    }
+                }
+
+                SetupPreferences();
+
                 if (key.equals("prefColorTheme")) {
                     SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getContext());
                     SharedPreferences.Editor editor1 = settings.edit();
@@ -168,10 +189,21 @@ public class FragmentSettings extends PreferenceFragmentCompat {
                     getActivity().getWindow().setWindowAnimations(R.style.MyCrossfadeAnimation_Window);
                     getActivity().recreate();
                 }
-
-                SetupPreferences();
             }
         };
+    }
+
+    @Override
+    public boolean onPreferenceTreeClick(Preference preference) {
+        Log.w("gpslogger.prefs", "onPreferenceTreeClick: " + preference.getKey() + " clicked");
+
+        Resources resources = getResources();
+
+        if (preference.getKey() == resources.getString(R.string.key_prefs_ftp_test_connection)) {
+            new Ftp4jFTPTestConnection().execute();
+        }
+
+        return super.onPreferenceTreeClick(preference);
     }
 
     @Override
@@ -212,7 +244,14 @@ public class FragmentSettings extends PreferenceFragmentCompat {
         ListPreference pShowDirections = (ListPreference) findPreference("prefShowDirections");
         ListPreference pViewTracksWith = (ListPreference) findPreference("prefViewTracksWith");
         ListPreference pColorTheme = (ListPreference) findPreference("prefColorTheme");
+        ListPreference pFTPEncryption = (ListPreference) findPreference(GPSApplication.getInstance().getResources().getString(R.string.key_prefs_ftp_encryption));
+        EditTextPreference pFileNamePrefix = (EditTextPreference) findPreference("prefFileNamePrefix");
         EditTextPreference pAltitudeCorrection = (EditTextPreference) findPreference("prefAltitudeCorrectionRaw");
+        EditTextPreference pFTPHost = (EditTextPreference) findPreference("prefFTPHost");
+        EditTextPreference pFTPPort = (EditTextPreference) findPreference(GPSApplication.getInstance().getResources().getString(R.string.key_prefs_ftp_port));
+        EditTextPreference pFTPUser = (EditTextPreference) findPreference("prefFTPUser");
+        EditTextPreference pFTPPassword = (EditTextPreference) findPreference("prefFTPPassword");
+        EditTextPreference pFTPPath = (EditTextPreference) findPreference("prefFTPPath");
 
         altcorm = Double.valueOf(prefs.getString("prefAltitudeCorrection", "0"));
         altcor = prefs.getString("prefUM", "0").equals("0") ? altcorm : altcorm * M_TO_FT;
@@ -248,8 +287,57 @@ public class FragmentSettings extends PreferenceFragmentCompat {
         pShowTrackStatsType.setSummary(pShowTrackStatsType.getEntry());
         pShowDirections.setSummary(pShowDirections.getEntry());
         pViewTracksWith.setSummary(pViewTracksWith.getEntry());
-    }
+        pFTPEncryption.setSummary(pFTPEncryption.getEntry());
 
+        String fileNamePrefix = pFileNamePrefix.getText();
+        if (fileNamePrefix != null && fileNamePrefix.length() > 0) {
+            pFileNamePrefix.setSummary(fileNamePrefix);
+        } else {
+            pFileNamePrefix.setSummary(R.string.pref_file_name_prefix_summary);
+        }
+
+        String ftpHost = pFTPHost.getText();
+        if (ftpHost != null && ftpHost.length() > 0) {
+            pFTPHost.setSummary(ftpHost);
+        } else {
+            pFTPHost.setSummary(R.string.pref_FTP_host_summary);
+        }
+
+        String ftpPort = pFTPPort.getText();
+        if (ftpPort != null && ftpPort.length() > 0) {
+            pFTPPort.setSummary(ftpPort);
+        } else {
+            pFTPPort.setText("21"); // Make sure the value is set to default value "21"
+            pFTPPort.setSummary(R.string.pref_FTP_port_summary);
+        }
+
+        String ftpUser = pFTPUser.getText();
+        if (ftpUser != null && ftpUser.length() > 0) {
+            pFTPUser.setSummary(ftpUser);
+        } else {
+            pFTPUser.setSummary(R.string.pref_FTP_user_summary);
+        }
+
+        String ftpPassword = pFTPPassword.getText();
+        if (ftpPassword != null && ftpPassword.length() > 0) {
+            String asterisks = "";
+
+            for (int i = 0; i < ftpPassword.length(); i++) {
+                asterisks += "*";
+            }
+
+            pFTPPassword.setSummary(asterisks);
+        } else {
+            pFTPPassword.setSummary(R.string.pref_FTP_password_summary);
+        }
+
+        String ftpPath = pFTPPath.getText();
+        if (ftpPath != null && ftpPath.length() > 0) {
+            pFTPPath.setSummary(ftpPath);
+        } else {
+            pFTPPath.setSummary(R.string.pref_FTP_path_summary);
+        }
+    }
 
     public void PrefEGM96SetToFalse() {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getContext());
