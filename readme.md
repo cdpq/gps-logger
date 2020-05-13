@@ -1,6 +1,6 @@
 # GPS Logger<br>[![Releases](https://img.shields.io/github/v/release/anthonyblanchettepotvin/gps-logger)](https://github.com/anthonyblanchettepotvin/gps-logger/releases) [![GitHub license](https://img.shields.io/github/license/anthonyblanchettepotvin/gps-logger)](https://raw.githubusercontent.com/anthonyblanchettepotvin/gps-logger/master/LICENSE)
 A GPS logger for Android mobile devices.<br>
-Offered by [BasicAirData](http://www.basicairdata.eu) - Open and free DIY air data instrumentation and telemetry
+Offered by [BasicAirData](http://www.basicairdata.eu) - Open and free DIY air data instrumentation and telemetry<br>
 Modified by [CDPQ](http://cdpq.ca) - Centre de développement du porc du Québec
 
 ![alt tag](https://github.com/anthonyblanchettepotvin/gps-logger/blob/master/screenshots/Image_01.png)
@@ -18,7 +18,7 @@ GPS Logger is a simple App to record your position and your path.<br>
 It's a basic and lightweight GPS tracker focused on accuracy, with an eye to power saving.<br>
 This app is very accurate in determining your altitude: enable EGM96 automatic altitude correction on settings!<br>
 You can record all your trips, view them in your preferred Viewer (it must be installed) directly from the in-app tracklist, and share them in KML, GPX, and TXT format in many ways.<br>
-Finally, the application supports transfer via FTP. Simply setup the connection in the settings and you are good to go!
+Finally, the application supports file transfer via FTP. Simply setup the connection in the settings and you are good to go!
 
 ## Reference documents
 
