@@ -22,16 +22,6 @@
         android:supportsRtl="true"
         android:theme="@style/LaunchScreenTheme">
 
-        <receiver
-            android:name=".SayHelloReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="SayHello"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
-        </receiver>
-
         <activity
             android:name=".GPSActivity"
             android:exported="true"

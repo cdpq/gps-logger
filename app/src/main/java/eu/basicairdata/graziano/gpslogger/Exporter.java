@@ -1,6 +1,7 @@
 /**
  * Exporter - Java Class for Android
  * Created by G.Capelli (BasicAirData) on 16/7/2016
+ * Modified by Anthony Blanchette-Potvin (CDPQ) in 2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
