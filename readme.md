@@ -1,29 +1,24 @@
-# BasicAirData GPS Logger<br>[![Releases](http://img.shields.io/github/release/BasicAirData/GPSLogger.svg?label=%20release%20)](https://github.com/BasicAirData/GPSLogger/releases) [![GitHub license](https://img.shields.io/badge/license-GPL_3-blue.svg?label=%20license%20)](https://raw.githubusercontent.com/BasicAirData/GPSLogger/master/LICENSE) [![Crowdin](https://d322cqt584bo4o.cloudfront.net/gpslogger/localized.svg)](https://crowdin.com/project/gpslogger) 
+# GPS Logger<br>[![Releases](https://img.shields.io/github/v/release/anthonyblanchettepotvin/gps-logger)](https://github.com/anthonyblanchettepotvin/gps-logger/releases) [![GitHub license](https://img.shields.io/github/license/anthonyblanchettepotvin/gps-logger)](https://raw.githubusercontent.com/anthonyblanchettepotvin/gps-logger/master/LICENSE)
 A GPS logger for Android mobile devices.<br>
-Offered by [BasicAirData](http://www.basicairdata.eu) - Open and free DIY air data instrumentation and telemetry 
+Offered by [BasicAirData](http://www.basicairdata.eu) - Open and free DIY air data instrumentation and telemetry
+Modified by [CDPQ](http://cdpq.ca) - Centre de développement du porc du Québec
 
-![alt tag](https://github.com/BasicAirData/GPSLogger/blob/master/screenshots/Image_01.png)
+![alt tag](https://github.com/anthonyblanchettepotvin/gps-logger/blob/master/screenshots/Image_01.png)
+
+## Disclaimer
+
+This is a custom version of the official application made by [BasicAirData](https://www.basicairdata.eu/).
+This version is not downloadable on Google Play and will receive specific features based on CDPQ's needs.
+That said, most of the screenshots doesn't reflect the current and future state of the application.
+For more information on the official application, see the [official BasicAirData GPS Logger repository](https://github.com/BasicAirData/GPSLogger).
 
 ## Description
 
-BasicAirData GPS Logger is a simple App to record your position and your path.<br>
+GPS Logger is a simple App to record your position and your path.<br>
 It's a basic and lightweight GPS tracker focused on accuracy, with an eye to power saving.<br>
 This app is very accurate in determining your altitude: enable EGM96 automatic altitude correction on settings!<br>
-You can record all your trips, view them in your preferred Viewer (it must be installed) directly from the in-app tracklist, and share them in KML, GPX, and TXT format in many ways.
-
-The app is 100% Free and Open Source.
-
-For further information about this app you can read [this article](http://www.basicairdata.eu/projects/android/android-gps-logger/).<br>
-[Here](http://www.basicairdata.eu/projects/android/android-gps-logger/getting-started-guide-for-gps-logger/) you can find a Getting Started Guide.<br><br>
-The application is freely downloadable from [Google Play(tm)](https://play.google.com/store/apps/details?id=eu.basicairdata.graziano.gpslogger) or directly here in this repository in /apk folder.<br>
-You can install GPS Logger on your smartphone in one step, using the Google Store [QR-Code](https://github.com/BasicAirData/GPSLogger/blob/master/screenshots/qrcode%20-%20Google%20Store.png) or the Latest APK [QR-Code](https://github.com/BasicAirData/GPSLogger/blob/master/screenshots/qrcode.png);
-
-## Translations
-
-The app is translated in many languages thanks to the precious collaboration of some willing users around the world.<br>
-Do you want to add a new language to the app?<br>
-Do you want to help us in translations?<br>
-Join Us on [Crowdin](https://crowdin.com/project/gpslogger) and help to translate and keep updated the app in your Language!
+You can record all your trips, view them in your preferred Viewer (it must be installed) directly from the in-app tracklist, and share them in KML, GPX, and TXT format in many ways.<br>
+Finally, the application supports transfer via FTP. Simply setup the connection in the settings and you are good to go!
 
 ## Reference documents
 
