@@ -109,11 +109,11 @@ class Exporter extends Thread {
         // ------------------------------------------------- Create the Directory tree if not exist
         File sd = new File(Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory());
         if (!sd.exists()) {
-            sd.mkdir();
+            sd.mkdirs();
         }
         sd = new File(Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory() + "/AppData");
         if (!sd.exists()) {
-            sd.mkdir();
+            sd.mkdirs();
         }
         // ----------------------------------------------------------------------------------------
 
@@ -161,10 +161,10 @@ class Exporter extends Thread {
         sd = new File(SaveIntoFolder);
         boolean success = true;
         if (!sd.exists()) {
-            success = sd.mkdir();
+            success = sd.mkdirs();
         }
         if (!success) {
-            Log.w("myApp", "[#] Exporter.java - Unable to sd.mkdir");
+            Log.w("myApp", "[#] Exporter.java - Unable to sd.mkdirs");
             exportingTask.setStatus(ExportingTask.STATUS_ENDED_FAILED);
             //EventBus.getDefault().post(new EventBusMSGNormal(EventBusMSG.TOAST_UNABLE_TO_WRITE_THE_FILE, track.getId()));
             return;

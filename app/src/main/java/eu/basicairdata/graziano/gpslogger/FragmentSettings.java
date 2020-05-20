@@ -84,11 +84,11 @@ public class FragmentSettings extends PreferenceFragmentCompat {
         File tsd = new File(Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory());
         boolean isGPSLoggerFolder = true;
         if (!tsd.exists()) {
-            isGPSLoggerFolder = tsd.mkdir();
+            isGPSLoggerFolder = tsd.mkdirs();
         }
         tsd = new File(Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory() + "/AppData");
         if (!tsd.exists()) {
-            isGPSLoggerFolder = tsd.mkdir();
+            isGPSLoggerFolder = tsd.mkdirs();
         }
         Log.w("myApp", "[#] FragmentSettings.java - " + (isGPSLoggerFolder ? "Folder /" + GPSApplication.getPrefExportDirectory() + "/AppData OK" : "Unable to create folder /" + GPSApplication.getPrefExportDirectory() + "/AppData"));
 

@@ -774,18 +774,18 @@ public class GPSApplication extends Application implements GpsStatus.Listener, L
 
         File sd = new File(Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory());   // Create the Directories if not exist
         if (!sd.exists()) {
-            sd.mkdir();
+            sd.mkdirs();
             Log.w("myApp", "[#] GPSApplication.java - Folder created: " + sd.getAbsolutePath());
         }
         sd = new File(Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory() + "/AppData");
         if (!sd.exists()) {
-            sd.mkdir();
+            sd.mkdirs();
             Log.w("myApp", "[#] GPSApplication.java - Folder created: " + sd.getAbsolutePath());
         }
 
         sd = new File(getApplicationContext().getFilesDir() + "/Thumbnails");
         if (!sd.exists()) {
-            sd.mkdir();
+            sd.mkdirs();
             Log.w("myApp", "[#] GPSApplication.java - Folder created: " + sd.getAbsolutePath());
         }
 

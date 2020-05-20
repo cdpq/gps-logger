@@ -584,15 +584,15 @@ public class GPSActivity extends AppCompatActivity {
                             // ---------------------------------------------------- Create the Directories if not exist
                             File sd = new File(Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory());
                             if (!sd.exists()) {
-                                sd.mkdir();
+                                sd.mkdirs();
                             }
                             sd = new File(Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory() + "/AppData");
                             if (!sd.exists()) {
-                                sd.mkdir();
+                                sd.mkdirs();
                             }
                             sd = new File(getApplicationContext().getFilesDir() + "/Thumbnails");
                             if (!sd.exists()) {
-                                sd.mkdir();
+                                sd.mkdirs();
                             }
                             EGM96 egm96 = EGM96.getInstance();
                             if (egm96 != null) {
