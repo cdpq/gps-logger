@@ -39,7 +39,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     // All Static variables
     // Database Version
-    private static final int DATABASE_VERSION = 5;          // Updated up to 5 in v3.0.0
+    private static final int DATABASE_VERSION = 6;          // Updated up to 6 in v2.4.0
     private static final int LOCATION_TYPE_LOCATION = 1;
     private static final int LOCATION_TYPE_PLACEMARK = 2;
 
@@ -128,6 +128,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_TRACK_EXPORTED = "exported";
     private static final String KEY_TRACK_TRANSFERRED = "transferred";
     private static final String KEY_TRACK_VALIDMAP = "validmap";
+    private static final String KEY_TRACK_EXPORT_DIRECTORY = "export_directory";
 
 
 
@@ -181,7 +182,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_TRACK_VALIDMAP + " INTEGER,"                  // 39
                 + KEY_TRACK_TYPE + " INTEGER, "                     // 40
                 + KEY_TRACK_EXPORTED + " INTEGER,"                  // 41
-                + KEY_TRACK_TRANSFERRED + " INTEGER" + ")";         // 42
+                + KEY_TRACK_TRANSFERRED + " INTEGER,"               // 42
+                + KEY_TRACK_EXPORT_DIRECTORY + " TEXT" + ")";       // 43
         db.execSQL(CREATE_TRACKS_TABLE);
 
         String CREATE_LOCATIONS_TABLE = "CREATE TABLE " + TABLE_LOCATIONS + "("
@@ -229,6 +231,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             + TABLE_TRACKS + " ADD COLUMN " + KEY_TRACK_EXPORTED + " INTEGER DEFAULT " + "0" + ";";
     private static final String DATABASE_ALTER_TABLE_TRACKS_TO_V5 = "ALTER TABLE "
             + TABLE_TRACKS + " ADD COLUMN " + KEY_TRACK_TRANSFERRED + " INTEGER DEFAULT " + "0" + ";";
+    private static final String DATABASE_ALTER_TABLE_TRACKS_TO_V6 = "ALTER TABLE "
+            + TABLE_TRACKS + " ADD COLUMN " + KEY_TRACK_EXPORT_DIRECTORY + " TEXT DEFAULT " + "'GPSLogger'" + ";";
 
     // Upgrading database
     @Override
@@ -260,6 +264,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             case 4:
                 //upgrade from version 4 to 5
                 db.execSQL(DATABASE_ALTER_TABLE_TRACKS_TO_V5);
+            case 5:
+                //upgrade from version 5 to 6
+                db.execSQL(DATABASE_ALTER_TABLE_TRACKS_TO_V6);
 
                 //and so on.. do not add breaks so that switch will
                 //start at oldVersion, and run straight through to the latest
@@ -403,6 +410,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         trkvalues.put(KEY_TRACK_EXPORTED, track.getExported());
         trkvalues.put(KEY_TRACK_TRANSFERRED, track.getTransferred());
         trkvalues.put(KEY_TRACK_VALIDMAP, track.getValidMap());
+
+        trkvalues.put(KEY_TRACK_EXPORT_DIRECTORY, track.getExportDirectory());
 
         db.beginTransaction();
         db.update(TABLE_TRACKS, trkvalues, KEY_ID + " = ?",
@@ -744,6 +753,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         trkvalues.put(KEY_TRACK_TRANSFERRED, track.getTransferred());
         trkvalues.put(KEY_TRACK_VALIDMAP, track.getValidMap());
 
+        trkvalues.put(KEY_TRACK_EXPORT_DIRECTORY, track.getExportDirectory());
+
         long TrackID;
         // Inserting Row
         TrackID = (db.insert(TABLE_TRACKS, null, trkvalues));
@@ -842,7 +853,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         cursor.getInt(39),
                         cursor.getInt(40),
                         cursor.getInt(41),
-                        cursor.getInt(42));
+                        cursor.getInt(42),
+                        cursor.getString(43));
             }
             cursor.close();
         }
@@ -1001,7 +1013,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             cursor.getInt(39),
                             cursor.getInt(40),
                             cursor.getInt(41),
-                            cursor.getInt(42));
+                            cursor.getInt(42),
+                            cursor.getString(43));
 
                     trackList.add(trk);             // Add Track to list
                 } while (cursor.moveToNext());
@@ -1077,7 +1090,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         cursor.getInt(39),
                         cursor.getInt(40),
                         cursor.getInt(41),
-                        cursor.getInt(42));
+                        cursor.getInt(42),
+                        cursor.getString(43));
 
                     tracks.add(track);
                 } while (cursor.moveToNext());

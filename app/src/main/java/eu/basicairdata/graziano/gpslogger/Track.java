@@ -110,8 +110,10 @@ public class Track {
 
     private int Type = TRACK_TYPE_ND;                               // Saved in DB
 
-    private int Exported                        = 0;            // Saved in DB
-    private int Transferred                     = 0;            // Saved in DB
+    private int Exported                        = 0;                // Saved in DB
+    private int Transferred                     = 0;                // Saved in DB
+
+    private String ExportDirectory              = "GPSLogger";      // Saved in DB
 
     // True if the card view is selected
     private boolean Selected = false;
@@ -307,7 +309,7 @@ public class Track {
                        long DistanceLastAltitude, double Altitude_Up, double Altitude_Down,
                        double Altitude_InProgress, float SpeedMax, float   SpeedAverage,
                        float SpeedAverageMoving, long NumberOfLocations, long NumberOfPlacemarks,
-                       int ValidMap, int Type, int Exported, int Transferred) {
+                       int ValidMap, int Type, int Exported, int Transferred, String ExportDirectory) {
         this.id = id;
         this.Name = Name;
 
@@ -363,6 +365,8 @@ public class Track {
 
         this.Exported = Exported;
         this.Transferred = Transferred;
+
+        this.ExportDirectory = ExportDirectory;
 
         EGM96 egm96 = EGM96.getInstance();
         if (egm96 != null) {
@@ -591,6 +595,10 @@ public class Track {
         Selected = selected;
     }
 
+    public String getExportDirectory() { return this.ExportDirectory; }
+
+    public void setExportDirectory(String exportDirectory) { this.ExportDirectory = exportDirectory; }
+
     public File getTXTFile() {
         return getFile(FILE_TYPE_TXT);
     }
@@ -617,7 +625,7 @@ public class Track {
                 fileExtension = ".txt";
                 break;
         }
-        String path = Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory() + "/" + getName() + fileExtension;
+        String path = Environment.getExternalStorageDirectory() + "/" + this.getExportDirectory() + "/" + getName() + fileExtension;
         File file = new File(path);
         return file.exists() ? file : null;
     }
