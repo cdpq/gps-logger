@@ -246,9 +246,9 @@ public class FragmentTracklist extends Fragment {
             boolean fileexist = false;
             if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 for (Track track : selectedTracks) {
-                    fileexist |= FileExists(Environment.getExternalStorageDirectory() + "/GPSLogger/" + track.getName() + ".kml")
-                            || FileExists(Environment.getExternalStorageDirectory() + "/GPSLogger/" + track.getName() + ".gpx")
-                            || FileExists(Environment.getExternalStorageDirectory() + "/GPSLogger/" + track.getName() + ".txt");
+                    fileexist |= FileExists(Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory() + "/" + track.getName() + ".kml")
+                            || FileExists(Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory() + "/" + track.getName() + ".gpx")
+                            || FileExists(Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory() + "/" + track.getName() + ".txt");
                 }
             }
             if (fileexist) {
@@ -362,19 +362,19 @@ public class FragmentTracklist extends Fragment {
                 }
 
                 String fname = track.getName() + ".kml";
-                file = new File(Environment.getExternalStorageDirectory() + "/GPSLogger/AppData/", fname);
+                file = new File(Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory() + "/AppData/", fname);
                 if (file.exists () && GPSApplication.getInstance().getPrefExportKML()) {
                     Uri uri = Uri.fromFile(file);
                     files.add(uri);
                 }
                 fname = track.getName() + ".gpx";
-                file = new File(Environment.getExternalStorageDirectory() + "/GPSLogger/AppData/", fname);
+                file = new File(Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory() + "/AppData/", fname);
                 if (file.exists ()  && GPSApplication.getInstance().getPrefExportGPX()) {
                     Uri uri = Uri.fromFile(file);
                     files.add(uri);
                 }
                 fname = track.getName() + ".txt";
-                file = new File(Environment.getExternalStorageDirectory() + "/GPSLogger/AppData/", fname);
+                file = new File(Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory() + "/AppData/", fname);
                 if (file.exists ()  && GPSApplication.getInstance().getPrefExportTXT()) {
                     Uri uri = Uri.fromFile(file);
                     files.add(uri);

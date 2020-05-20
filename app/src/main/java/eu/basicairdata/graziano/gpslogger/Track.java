@@ -617,7 +617,7 @@ public class Track {
                 fileExtension = ".txt";
                 break;
         }
-        String path = Environment.getExternalStorageDirectory() + "/GPSLogger/" + getName() + fileExtension;
+        String path = Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory() + getName() + fileExtension;
         File file = new File(path);
         return file.exists() ? file : null;
     }

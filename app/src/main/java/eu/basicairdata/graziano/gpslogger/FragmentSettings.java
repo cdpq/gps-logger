@@ -81,22 +81,22 @@ public class FragmentSettings extends PreferenceFragmentCompat {
 
         addPreferencesFromResource(R.xml.app_preferences);
 
-        File tsd = new File(Environment.getExternalStorageDirectory() + "/GPSLogger");
+        File tsd = new File(Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory());
         boolean isGPSLoggerFolder = true;
         if (!tsd.exists()) {
             isGPSLoggerFolder = tsd.mkdir();
         }
-        tsd = new File(Environment.getExternalStorageDirectory() + "/GPSLogger/AppData");
+        tsd = new File(Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory() + "/AppData");
         if (!tsd.exists()) {
             isGPSLoggerFolder = tsd.mkdir();
         }
-        Log.w("myApp", "[#] FragmentSettings.java - " + (isGPSLoggerFolder ? "Folder /GPSLogger/AppData OK" : "Unable to create folder /GPSLogger/AppData"));
+        Log.w("myApp", "[#] FragmentSettings.java - " + (isGPSLoggerFolder ? "Folder /" + GPSApplication.getPrefExportDirectory() + "/AppData OK" : "Unable to create folder /" + GPSApplication.getPrefExportDirectory() + "/AppData"));
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
 
         // Chech if EGM96 file is downloaded and complete;
         File sd = new File(getActivity().getApplicationContext().getFilesDir() + "/WW15MGH.DAC");
-        File sd_old = new File(Environment.getExternalStorageDirectory() + "/GPSLogger/AppData/WW15MGH.DAC");
+        File sd_old = new File(Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory() + "/AppData/WW15MGH.DAC");
         if ((sd.exists() && (sd.length() == 2076480)) || (sd_old.exists() && (sd_old.length() == 2076480))) {
             Downloaded = true;
         } else {
@@ -246,6 +246,7 @@ public class FragmentSettings extends PreferenceFragmentCompat {
         ListPreference pViewTracksWith = (ListPreference) findPreference("prefViewTracksWith");
         ListPreference pColorTheme = (ListPreference) findPreference("prefColorTheme");
         ListPreference pFTPEncryption = (ListPreference) findPreference(GPSApplication.getInstance().getResources().getString(R.string.key_prefs_ftp_encryption));
+        EditTextPreference pExportDirectory = (EditTextPreference) findPreference("prefExportDirectory");
         EditTextPreference pFileNamePrefix = (EditTextPreference) findPreference("prefFileNamePrefix");
         EditTextPreference pAltitudeCorrection = (EditTextPreference) findPreference("prefAltitudeCorrectionRaw");
         EditTextPreference pFTPHost = (EditTextPreference) findPreference("prefFTPHost");
@@ -289,6 +290,13 @@ public class FragmentSettings extends PreferenceFragmentCompat {
         pShowDirections.setSummary(pShowDirections.getEntry());
         pViewTracksWith.setSummary(pViewTracksWith.getEntry());
         pFTPEncryption.setSummary(pFTPEncryption.getEntry());
+
+        String exportDirectory = pExportDirectory.getText();
+        if (exportDirectory != null && exportDirectory.length() > 0) {
+            pExportDirectory.setSummary(exportDirectory);
+        } else {
+            pFileNamePrefix.setSummary(R.string.pref_export_directory_default);
+        }
 
         String fileNamePrefix = pFileNamePrefix.getText();
         if (fileNamePrefix != null && fileNamePrefix.length() > 0) {
@@ -571,7 +579,7 @@ public class FragmentSettings extends PreferenceFragmentCompat {
                     Toast.makeText(context, getString(R.string.toast_download_error) + ": " + result, Toast.LENGTH_LONG).show();
                 else {
                     File sd = new File(getActivity().getApplicationContext().getFilesDir() + "/WW15MGH.DAC");
-                    File sd_old = new File(Environment.getExternalStorageDirectory() + "/GPSLogger/AppData/WW15MGH.DAC");
+                    File sd_old = new File(Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory() + "/AppData/WW15MGH.DAC");
                     if ((sd.exists() && (sd.length() == 2076480)) || (sd_old.exists() && (sd_old.length() == 2076480))) {
                         Downloaded = true;
                         Toast.makeText(context, getString(R.string.toast_download_completed), Toast.LENGTH_SHORT).show();

@@ -107,11 +107,11 @@ class Exporter extends Thread {
         long start_Time = System.currentTimeMillis();
 
         // ------------------------------------------------- Create the Directory tree if not exist
-        File sd = new File(Environment.getExternalStorageDirectory() + "/GPSLogger");
+        File sd = new File(Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory());
         if (!sd.exists()) {
             sd.mkdir();
         }
-        sd = new File(Environment.getExternalStorageDirectory() + "/GPSLogger/AppData");
+        sd = new File(Environment.getExternalStorageDirectory() + "/" + GPSApplication.getPrefExportDirectory() + "/AppData");
         if (!sd.exists()) {
             sd.mkdir();
         }

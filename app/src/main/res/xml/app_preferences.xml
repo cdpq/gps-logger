@@ -129,6 +129,12 @@
     <android.support.v7.preference.PreferenceCategory
         android:title="@string/pref_category_exporting">
 
+        <android.support.v7.preference.EditTextPreference
+            android:key="prefExportDirectory"
+            android:title="@string/pref_export_directory"
+            android:summary="@string/pref_export_directory_summary"
+            android:defaultValue="@string/pref_export_directory_default" />
+
         <android.support.v7.preference.SwitchPreferenceCompat
             android:key="prefExportWhenCompleted"
             android:title="@string/pref_export_when_completed"

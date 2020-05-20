@@ -154,6 +154,9 @@
     <string name="pref_AltitudeCorrection_summary_offset">Décalage</string>
     <string name="pref_AltitudeCorrection_summary_not_defined">Aucun décalage défini</string>
     <string name="pref_category_exporting">EXPORTATION</string>
+    <string name="pref_export_directory">Dossier d\'exportation</string>
+    <string name="pref_export_directory_summary">Le dossier dans lequel les Tracés devraient être exportés</string>
+    <string name="pref_export_directory_default">GPSLogger</string>
     <string name="pref_export_when_completed">Exporter les Tracés lorsque terminés</string>
     <string name="pref_export_when_completed_summary">Indique que les Tracés doivent être exportés automatiquement lorsque terminés</string>
     <string name="pref_file_name_prefix">Préfixe des Tracés</string>
