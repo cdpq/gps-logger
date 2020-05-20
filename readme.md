@@ -1,9 +1,9 @@
-# GPS Logger<br>[![Releases](https://img.shields.io/github/v/release/anthonyblanchettepotvin/gps-logger)](https://github.com/anthonyblanchettepotvin/gps-logger/releases) [![GitHub license](https://img.shields.io/github/license/anthonyblanchettepotvin/gps-logger)](https://raw.githubusercontent.com/anthonyblanchettepotvin/gps-logger/master/LICENSE)
+# GPS Logger<br>[![Releases](https://img.shields.io/github/v/release/cdpq/gps-logger)](https://github.com/cdpq/gps-logger/releases) [![GitHub license](https://img.shields.io/github/license/cdpq/gps-logger)](https://raw.githubusercontent.com/cdpq/gps-logger/master/LICENSE)
 A GPS logger for Android mobile devices.<br>
 Offered by [BasicAirData](http://www.basicairdata.eu) - Open and free DIY air data instrumentation and telemetry<br>
 Modified by [CDPQ](http://cdpq.ca) - Centre de développement du porc du Québec
 
-![alt tag](https://github.com/anthonyblanchettepotvin/gps-logger/blob/master/screenshots/Image_01.png)
+![alt tag](https://github.com/cdpq/gps-logger/blob/master/screenshots/Image_01.png)
 
 ## Disclaimer
 
