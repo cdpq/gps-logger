@@ -415,7 +415,7 @@ public class GPSActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(context, getString(R.string.toast_track_exported), Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, getString(R.string.toast_track_exported) + " " + GPSApplication.getPrefExportDirectory(), Toast.LENGTH_LONG).show();
                     }
                 });
                 break;
